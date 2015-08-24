@@ -1,0 +1,4 @@
+l = [hex(0x48), hex(0x89), hex(0xf8), hex(0x48), hex(0x83), hex(0xc0), hex(0x04), hex(0xc3)]
+import binascii
+
+b = bytes(int(x, 16) for x in l)
