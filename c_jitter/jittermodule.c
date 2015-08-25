@@ -58,22 +58,44 @@ void emit_to_rw_run_from_rx(unsigned char *code) {
 
 static PyObject *JitterError;
 
-static PyObject* jitter_jit(PyObject *self, PyObject *args) {
+static PyObject* jitter_jit(PyObject *self, PyObject *args, PyObject *keywrds) {
     const char* str;
     char * buf;
     Py_ssize_t count;
     PyObject * result;
+    PyObject *sig;
     int i;
 
-    if (!PyArg_ParseTuple(args, "z#", &str, &count))
-    {
+    static char *kwlist[] = {"code", "signature", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, keywrds, "|z#O", kwlist,
+                                     &str, &count, &sig))
         return NULL;
-    }
+
+
 
     int buffer_size = (int)count;
 
     printf("Initiailzed Jitter with code size: %d bytes\n", buffer_size);
     
+    // Check the types for the function signature
+    PyObject *sig_seq = PySequence_Fast(sig, "expected a sequence");
+    int signature_len = PySequence_Size(sig_seq);
+
+    printf("Signature Size: %d\n", signature_len);
+
+    for (i = 0; i < signature_len; i++) {
+        item = PySequence_Fast_GET_ITEM(seq, i);
+    }
+    Py_DECREF(seq);
+
+
+    // PyObject *ret_type_seq = PySequence_Fast(retTys, "expected a sequence");
+    //int ret_type_len = PySequence_Size(ret_type_len);
+
+    // printf("Num Return Tys: %d\n", ret_type_seq);
+    // printf("Num Arg Tys: %d\n", arg_types_len);
+
     emit_to_rw_run_from_rx(str);
 
     result = PyLong_FromLong(1.0);
@@ -82,36 +104,36 @@ static PyObject* jitter_jit(PyObject *self, PyObject *args) {
 }
 
 static PyMethodDef JitterMethods[] = {
-	{"jit", jitter_jit, METH_VARARGS, "Jit a method at runtime"},
-	{NULL, NULL, 0, NULL}
+  {"jit", (PyCFunction)jitter_jit, METH_VARARGS | METH_KEYWORDS, "Jit a method at runtime"},
+  {NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef jittermodule = {
-	PyModuleDef_HEAD_INIT,
-	"jitter",
-	NULL,
-	-1,
-	JitterMethods
+  PyModuleDef_HEAD_INIT,
+  "jitter",
+  NULL,
+  -1,
+  JitterMethods
 };
 
 PyMODINIT_FUNC PyInit_jitter(void) {
-	PyObject *m;
-	m = PyModule_Create(&jittermodule);
-	if (m == NULL)
-		return NULL;
+  PyObject *m;
+  m = PyModule_Create(&jittermodule);
+  if (m == NULL)
+    return NULL;
 
-	JitterError = PyErr_NewException("jitter.error", NULL, NULL);
-	Py_INCREF(JitterError);
-	PyModule_AddObject(m, "error", JitterError);
-	return m;
+  JitterError = PyErr_NewException("jitter.error", NULL, NULL);
+  Py_INCREF(JitterError);
+  PyModule_AddObject(m, "error", JitterError);
+  return m;
 }
 
 int main(int argc, char *argv[]) {
-	PyImport_AppendInittab("jitter", PyInit_jitter);
+  PyImport_AppendInittab("jitter", PyInit_jitter);
 
-	Py_SetProgramName(argv[0]);
+  Py_SetProgramName(argv[0]);
 
-	Py_Initialize();
+  Py_Initialize();
 
-	PyImport_ImportModule("jitter");
+  PyImport_ImportModule("jitter");
 }
