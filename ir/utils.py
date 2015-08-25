@@ -1,12 +1,12 @@
 __author__ = 'sarangis'
 
-from ir.instructions import *
+import ir.instructions
 
 def is_terminator_instruction(inst):
-    if (isinstance(inst, TerminateInstruction) or
-        isinstance(inst, ReturnInstruction) or
-        isinstance(inst, BranchInstruction) or
-        isinstance(inst, ConditionalBranchInstruction)):
+    if (isinstance(inst, ir.instructions.TerminateInstruction) or
+        isinstance(inst, ir.instructions.ReturnInstruction) or
+        isinstance(inst, ir.instructions.BranchInstruction) or
+        isinstance(inst, ir.instructions.ConditionalBranchInstruction)):
         return True
     else:
         return False

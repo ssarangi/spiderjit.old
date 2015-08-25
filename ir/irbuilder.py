@@ -5,6 +5,7 @@ from ir.function import *
 from ir.context import *
 from ir.module import *
 from ir.instructions import *
+from ir.basicblock import *
 
 class IRBuilder:
     """ The main builder to be used for creating instructions. This has to be used to insert / create / modify instructions

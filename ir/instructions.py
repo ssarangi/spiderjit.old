@@ -2,7 +2,7 @@ __author__ = 'sarangis'
 
 from ir.value import *
 from ir.types import *
-from ir.basicblock import BasicBlock
+import ir.basicblock
 
 class Instruction(Value):
     def __init__(self):
@@ -68,7 +68,7 @@ class PhiInstruction(Instruction):
 
 class BranchInstruction(Instruction):
     def __init__(self, bb):
-        if not isinstance(bb, BasicBlock):
+        if not isinstance(bb, ir.basicblock.BasicBlock):
             raise InvalidTypeException("Expected a Basic Block type")
 
         self.__bb = bb
