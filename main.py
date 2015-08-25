@@ -13,8 +13,8 @@ def main():
     irbuilder = IRBuilder(mod, ctx)
     ft = irbuilder.create_function_type(int32Ty, floatTy, floatTy)
     f = irbuilder.create_function("test_fn", ft)
-    arg4 = Argument(int32Ty, "myarg")
-    f.insert_arg(arg4, 6)
+    arg4 = Argument(floatTy, "myarg")
+    f.insert_arg(arg4, 0)
 
     bb = irbuilder.create_basic_block("entry")
     f.basic_blocks.append(bb)

@@ -20,7 +20,7 @@ class Function(Validator):
             raise InvalidTypeException("Function Type expected")
 
         self.__ftype = ftype
-        self.__arguments = []
+        self.__arguments = [None] * len(ftype.arg_types)
 
     @property
     def basic_blocks(self):
@@ -34,19 +34,39 @@ class Function(Validator):
     def args(self):
         return self.__arguments
 
+    @verify(arg=Argument)
     def insert_arg(self, arg, idx = None):
+        if idx > len(self.__ftype.arg_types):
+            raise InvalidUsageModel("Invalid argument type. Function supports %s arguments but argument to be "
+                                    "added at index %s" % (len(self.__ftype.arg_types), idx))
+
+        # Check the function type for the number of args
+        arg_type_idx = -1
+        if idx is None:
+            # Check the length of the arguments.
+            arg_type_idx = len(self.__arguments)
+        else:
+            arg_type_idx = idx
+
+        print(arg_type_idx)
+        # Now check if the index we got has the same type as the one in function type
+        arg_type = self.__ftype.arg_types[arg_type_idx]
+        # Make sure that the arg has the same type as the arg type
+        print(type(arg_type))
+        print(type(arg.type))
+        if not isinstance(arg.type, arg_type):
+            raise InvalidTypeException("Argument: " + str(arg) + " Expected: " + str(arg_type) + " Received: " + str(arg.type))
+
         # Validate the arg
         if not isinstance(arg, Argument):
             raise InvalidTypeException("Argument type expected")
 
-        if idx != None:
+        if idx is not None:
             # Check if the argument list is already that size
-            if (len(self.__arguments) > idx):
+            if len(self.__arguments) > idx:
                 self.__arguments.insert(idx, arg)
             else:
                 current_len = len(self.__arguments)
-                for i in range(current_len, idx - 1):
-                    self.__arguments.append(None)
                 self.__arguments.append(arg)
 
     @property
