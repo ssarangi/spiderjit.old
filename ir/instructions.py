@@ -39,8 +39,10 @@ class ReturnInstruction(Instruction):
         pass
 
     def __str__(self):
-        output_str = "\t" + "return void"
+        output_str = "return void"
         return output_str
+
+    __repr__ = __str__
 
 class SelectInstruction(Instruction):
     def __init__(self):
@@ -76,6 +78,8 @@ class BranchInstruction(Instruction):
     def __str__(self):
         output_str = "br " + self.__bb.name
         return output_str
+
+    __repr__ = __str__
 
 class ConditionalBranchInstruction(BranchInstruction):
     def __init__(self):

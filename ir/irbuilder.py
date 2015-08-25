@@ -102,7 +102,10 @@ class IRBuilder:
     def create_function_type(self, ret_ty, *arg_tys):
         return FunctionType(ret_ty, *arg_tys)
 
-    def create_function(self, name, *args):
+    def create_function(self, name, ftype, *args):
+        if isinstance(name, str):
+            raise InvalidTypeException("Was expecting a string for name")
+
         if (len(args) == 1 and isinstance(args[0], FunctionType)):
             return Function(name, args[0])
         else:

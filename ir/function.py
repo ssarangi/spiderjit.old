@@ -18,6 +18,7 @@ class Function(Validator):
             raise InvalidTypeException("Function Type expected")
 
         self.__ftype = ftype
+        self.__arguments = []
 
     @property
     def basic_blocks(self):
@@ -26,6 +27,25 @@ class Function(Validator):
     @basic_blocks.setter
     def basic_blocks(self, block):
         return self.__basic_blocks.append(block)
+
+    @property
+    def args(self):
+        return self.__arguments
+
+    def insert_arg(self, arg, idx = None):
+        # Validate the arg
+        if not isinstance(arg, Argument):
+            raise InvalidTypeException("Argument type expected")
+
+        if idx != None:
+            # Check if the argument list is already that size
+            if (len(self.__arguments) > idx):
+                self.__arguments.insert(idx, arg)
+            else:
+                current_len = len(self.__arguments)
+                for i in range(current_len, idx - 1):
+                    self.__arguments.append(None)
+                self.__arguments.append(arg)
 
     @property
     def name(self):
@@ -56,3 +76,5 @@ class Function(Validator):
     def validate(self):
         for bb in self.__basic_blocks:
             bb.validate()
+
+    __repr__ = __str__

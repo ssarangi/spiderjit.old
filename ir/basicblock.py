@@ -54,6 +54,8 @@ class BasicBlock(Validator):
     def __str__(self):
         output_str = self.name + ":\n"
         for i in self.__instructions:
-            output_str += str(i) + "\n"
+            output_str += "\t" + str(i) + "\n"
 
         return output_str
+
+    __repr__ = __str__

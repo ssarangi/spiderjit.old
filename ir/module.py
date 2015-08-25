@@ -79,3 +79,5 @@ class Module(Validator):
     def validate(self):
         for f in self.__functions:
             f.validate()
+
+    __repr__ = __str__

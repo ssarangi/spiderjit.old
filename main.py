@@ -12,6 +12,11 @@ def main():
     mod = Module("MyModule", ctx)
     irbuilder = IRBuilder(mod, ctx)
     f = irbuilder.create_function("test_fn", int32Ty, int32Ty, floatTy, floatTy)
+
+    arg4 = Argument(int32Ty, "myarg")
+    f.insert_arg(arg4, 6)
+    print(f.args)
+
     bb = irbuilder.create_basic_block("entry")
     f.basic_blocks.append(bb)
     bb_exit = irbuilder.create_basic_block("exit")
@@ -35,4 +40,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # main()
+    test_verify("name")
