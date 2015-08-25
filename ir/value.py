@@ -1,23 +1,17 @@
 __author__ = 'sarangis'
 
 from ir.types import *
+from ir.validator import *
 
 class Value:
     def __init__(self):
         pass
 
 class Argument(Value):
-    def __init__(self, type, name):
+    def __init__(self, arg_type, name):
         Value.__init__(self)
-
-        if not isinstance(name, str):
-            raise InvalidTypeException("Expected a string")
         self.__name = name
-
-        if not isinstance(type, BaseType):
-            raise InvalidTypeException("Expected BaseType")
-
-        self.__type = type
+        self.__type = arg_type
 
     @property
     def name(self):

@@ -2,14 +2,11 @@ __author__ = 'sarangis'
 
 from ir.exceptions import *
 from ir.validator import *
+from ir.context import *
 
 class Module(Validator):
+    @verify(name=str, ctx=Context)
     def __init__(self, name, ctx):
-        if ctx is None:
-            raise IllegalArgumentException("Context missing")
-
-        if (name is None or name == ""):
-            raise IllegalArgumentException("Module Name is missing")
         self.__context = ctx
         self.__name = name
         self.__globals = []

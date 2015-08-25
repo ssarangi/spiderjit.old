@@ -11,11 +11,10 @@ def main():
     ctx = Context()
     mod = Module("MyModule", ctx)
     irbuilder = IRBuilder(mod, ctx)
-    f = irbuilder.create_function("test_fn", int32Ty, int32Ty, floatTy, floatTy)
-
+    ft = irbuilder.create_function_type(int32Ty, floatTy, floatTy)
+    f = irbuilder.create_function("test_fn", ft)
     arg4 = Argument(int32Ty, "myarg")
     f.insert_arg(arg4, 6)
-    print(f.args)
 
     bb = irbuilder.create_basic_block("entry")
     f.basic_blocks.append(bb)
@@ -33,12 +32,5 @@ def main():
 
     print(mod)
 
-    # itype = IntType(32)
-    # print(itype)
-    # pointer = PointerType(itype, 2)
-    # print(pointer)
-
-
 if __name__ == "__main__":
-    # main()
-    test_verify("name")
+    main()

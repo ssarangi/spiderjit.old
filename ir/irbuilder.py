@@ -5,7 +5,6 @@ from ir.function import *
 from ir.context import *
 from ir.module import *
 from ir.instructions import *
-from ir.basicblock import *
 
 class IRBuilder:
     """ The main builder to be used for creating instructions. This has to be used to insert / create / modify instructions
@@ -64,25 +63,6 @@ class IRBuilder:
         else:
             raise InvalidTypeException("Expected either Basic Block or Instruction")
 
-    # @classmethod
-    # def insert_instruction(instruction_creator):
-    #     def wrapper(self, *args, **kw):
-    #         # Calling your function
-    #         output = instruction_creator(*args, **kw)
-    #
-    #         # Now check the insertion point and add the instruction accordingly
-    #         if self.__insertion_point_idx == -1:
-    #             # This is an orphaned instruction
-    #             self.__orphaned_instructions.append(output)
-    #
-    #     return wrapper
-    #
-    # @insert_instruction
-    # def do_something(*args, **kwargs):
-    #     if args[0] == 'foo':
-    #         return 'bar'
-    #     else:
-    #         return 'baz'
     def __add_instruction(self, inst):
         if self.__insertion_point_idx == -1:
             # This is an orphaned instruction
@@ -102,15 +82,10 @@ class IRBuilder:
     def create_function_type(self, ret_ty, *arg_tys):
         return FunctionType(ret_ty, *arg_tys)
 
+    @verify(name=str, ftype=FunctionType)
     def create_function(self, name, ftype, *args):
-        if isinstance(name, str):
-            raise InvalidTypeException("Was expecting a string for name")
-
-        if (len(args) == 1 and isinstance(args[0], FunctionType)):
-            return Function(name, args[0])
-        else:
-            ftype = self.create_function_type(args[0], *args[1:])
-            return Function(name, ftype)
+        f = Function(name, ftype)
+        return f
 
     def create_basic_block(self, name):
         return BasicBlock(name)

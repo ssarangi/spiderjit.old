@@ -2,10 +2,12 @@ __author__ = 'sarangis'
 
 from ir.exceptions import *
 from ir.types import *
-from ir.instructions import *
+import ir.instructions
 from ir.validator import *
+from ir.value import *
 
 class Function(Validator):
+    @verify(name=str, ftype=FunctionType)
     def __init__(self, name, ftype):
         self.__basic_blocks = []
 
@@ -61,7 +63,7 @@ class Function(Validator):
 
         for count, arg_ty in enumerate(self.__ftype.arg_types):
             output_str += str(arg_ty)
-            if (count != len(self.__ftype.arg_types) - 1):
+            if count != len(self.__ftype.arg_types) - 1:
                 output_str += ", "
 
         output_str += ") {\n"

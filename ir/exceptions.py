@@ -14,3 +14,6 @@ class InvalidInstructionException(ValueError):
 
 class NoBBTerminatorException(ValueError):
     pass
+
+class InvalidUsageModel(ValueError):
+    pass
