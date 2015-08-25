@@ -5,3 +5,12 @@ class IllegalArgumentException(ValueError):
 
 class InvalidTypeException(ValueError):
     pass
+
+class InvalidInsertionPointException(ValueError):
+    pass
+
+class InvalidInstructionException(ValueError):
+    pass
+
+class NoBBTerminatorException(ValueError):
+    pass

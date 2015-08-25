@@ -1,8 +1,9 @@
 __author__ = 'sarangis'
 
 from ir.exceptions import *
+from ir.validator import *
 
-class Module:
+class Module(Validator):
     def __init__(self, name, ctx):
         if ctx is None:
             raise IllegalArgumentException("Context missing")
@@ -74,3 +75,7 @@ class Module:
             output_str += str(f)
 
         return output_str
+
+    def validate(self):
+        for f in self.__functions:
+            f.validate()

@@ -2,8 +2,10 @@ __author__ = 'sarangis'
 
 from ir.exceptions import *
 from ir.types import *
+from ir.instructions import *
+from ir.validator import *
 
-class Function:
+class Function(Validator):
     def __init__(self, name, ftype):
         self.__basic_blocks = []
 
@@ -44,9 +46,13 @@ class Function:
 
         output_str += ") {\n"
 
+        # render each basic block
+        for bb in self.__basic_blocks:
+            output_str += str(bb)
+
         output_str += "}\n\n"
         return output_str
 
-class BasicBlock:
-    def __init__(self):
-        pass
+    def validate(self):
+        for bb in self.__basic_blocks:
+            bb.validate()

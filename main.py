@@ -12,8 +12,21 @@ def main():
     mod = Module("MyModule", ctx)
     irbuilder = IRBuilder(mod, ctx)
     f = irbuilder.create_function("test_fn", int32Ty, int32Ty, floatTy, floatTy)
+    bb = irbuilder.create_basic_block("entry")
+    f.basic_blocks.append(bb)
+    bb_exit = irbuilder.create_basic_block("exit")
+    f.basic_blocks.append(bb_exit)
+
+    irbuilder.insert_after(bb)
+    irbuilder.create_branch(bb_exit)
+
+    irbuilder.insert_after(bb_exit)
+    irbuilder.create_return()
+
+    mod.functions.append(f)
+    mod.validate()
+
     print(mod)
-    print(f)
 
     # itype = IntType(32)
     # print(itype)

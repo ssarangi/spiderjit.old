@@ -1,13 +1,21 @@
 __author__ = 'sarangis'
 
+from ir.value import *
+from ir.types import *
+from ir.basicblock import BasicBlock
+
 class Instruction(Value):
     def __init__(self):
         Value.__init__(self)
+        self.__parent = None
 
-    def __new__(cls, *args, **kwargs):
-        if cls is Instruction:
-            raise TypeError("base class may not be instantiated")
-        return object.__new__(cls, *args, **kwargs)
+    @property
+    def parent(self):
+        return self.__parent
+
+    @parent.setter
+    def parent(self, bb):
+        self.__parent = bb
 
 class CallInstruction(Instruction):
     def __init__(self, func, *args):
@@ -31,7 +39,7 @@ class ReturnInstruction(Instruction):
         pass
 
     def __str__(self):
-        output_str = "ret"
+        output_str = "\t" + "return void"
         return output_str
 
 class SelectInstruction(Instruction):
@@ -59,8 +67,15 @@ class PhiInstruction(Instruction):
         pass
 
 class BranchInstruction(Instruction):
-    def __init__(self):
-        pass
+    def __init__(self, bb):
+        if not isinstance(bb, BasicBlock):
+            raise InvalidTypeException("Expected a Basic Block type")
+
+        self.__bb = bb
+
+    def __str__(self):
+        output_str = "br " + self.__bb.name
+        return output_str
 
 class ConditionalBranchInstruction(BranchInstruction):
     def __init__(self):
