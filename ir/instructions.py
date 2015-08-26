@@ -4,12 +4,38 @@ from ir.value import *
 from ir.types import *
 from ir.utils import *
 
+class InstructionList(list):
+    def __init__(self, name_generator):
+        list.__init__(self)
+        self.__name_generator = name_generator
+
+    def append(self, inst):
+        if inst.needs_name:
+            inst.name = self.__name_generator.generate(inst)
+
+        list.append(self, inst)
+
+    def insert(self, idx, inst):
+        if inst.needs_name:
+            inst.name = self.__name_generator.generate(inst)
+
+        list.insert(self, idx, inst)
+
+
+    def __add__(self, other):
+        raise NotImplementedError("__add__ method not implemented for InstructionList")
+
 class Instruction(Value):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, parent=None, name=None, needs_name=True):
         Value.__init__(self)
         self.__parent = parent
         self.__inst_idx = -1
         self.__name = name
+        self.__needs_name = needs_name
+
+    @property
+    def needs_name(self):
+        return self.__needs_name
 
     @property
     def parent(self):
@@ -54,7 +80,11 @@ class CallInstruction(Instruction):
         return self.__args
 
     def __str__(self):
-        output_str = "call @" + self.__func.render_signature()
+        functype = self.__func.type
+        output_str = "call " + str(functype.ret_type) + " @" + self.__func.name
+
+        output_str += render_list_with_parens(self.__args)
+
         return output_str
 
     __repr__ = __str__
@@ -72,7 +102,7 @@ class TerminateInstruction(Instruction):
 
 class ReturnInstruction(Instruction):
     def __init__(self, value=None, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, parent, name, needs_name=False)
         self.__value = value
 
     def __str__(self):
@@ -106,7 +136,7 @@ class LoadInstruction(Instruction):
 
 class StoreInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, parent, name, needs_name=False)
 
     def __str__(self):
         pass
@@ -146,7 +176,7 @@ class PhiInstruction(Instruction):
 
 class BranchInstruction(Instruction):
     def __init__(self, bb, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, parent, name, needs_name=False)
         if not isinstance(bb, BasicBlock):
             raise InvalidTypeException("Expected a Basic Block type")
 
@@ -157,6 +187,7 @@ class BranchInstruction(Instruction):
         return output_str
 
     __repr__ = __str__
+
 
 class ConditionalBranchInstruction(BranchInstruction):
     def __init__(self, bb, parent=None, name=None):
@@ -309,10 +340,10 @@ class InsertElementInstruction(Instruction):
 
 
 class BasicBlock(Validator):
-    def __init__(self, name, parent=None):
+    def __init__(self, name, parent):
         self.__name = name
-        self.__instructions = []
-        self.parent = parent
+        self.__parent = parent
+        self.__instructions = InstructionList(parent.name_generator)
 
     @property
     def name(self):
@@ -321,10 +352,6 @@ class BasicBlock(Validator):
     @property
     def instructions(self):
         return self.__instructions
-
-    @instructions.setter
-    def instructions(self, inst):
-        self.__instructions.append(inst)
 
     @property
     def parent(self):
@@ -340,7 +367,7 @@ class BasicBlock(Validator):
             raise InvalidTypeException("Expected an Instruction Type")
 
         for idx, i in enumerate(self.__instructions):
-            if (i == inst):
+            if i == inst:
                 return idx
 
         return None
@@ -358,7 +385,12 @@ class BasicBlock(Validator):
     def __str__(self):
         output_str = self.name + ":\n"
         for i in self.__instructions:
-            output_str += "\t" + str(i) + "\n"
+            output_str += "\t"
+
+            if i.name is not None:
+                output_str += "%" + i.name + " = "
+
+            output_str += str(i) + "\n"
 
         return output_str
 

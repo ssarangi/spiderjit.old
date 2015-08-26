@@ -10,3 +10,14 @@ def is_terminator_instruction(inst):
         return True
     else:
         return False
+
+def render_list_with_parens(custom_list):
+    output_str = "("
+    for idx, i in enumerate(custom_list):
+        output_str += str(i)
+        if idx < len(custom_list) - 1:
+            output_str += ", "
+
+    output_str += ")"
+
+    return output_str

@@ -90,8 +90,8 @@ class IRBuilder:
         f = Function(name, ftype)
         return f
 
-    def create_basic_block(self, name):
-        return BasicBlock(name)
+    def create_basic_block(self, name, parent):
+        return BasicBlock(name, parent)
 
     def create_return(self, value = None):
         ret_inst = ReturnInstruction()

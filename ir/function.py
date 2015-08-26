@@ -6,6 +6,33 @@ import ir.instructions
 from ir.validator import *
 from ir.value import *
 
+class NameGenerator:
+    def __init__(self):
+        self.__variable_idx = 0
+        self.__named_variables = {}
+
+    def __get_variable_idx(self):
+        current_idx = self.__variable_idx
+        self.__variable_idx += 1
+        return str(current_idx)
+
+    def __get_named_var_idx(self, name):
+        new_name = name
+        if name in self.__named_variables:
+            new_name += str(self.__named_variables[name] + 1)
+            self.__named_variables[name] += 1
+        else:
+            self.__named_variables[name] = 0
+
+        return new_name
+
+    @verify(inst=ir.instructions.Instruction)
+    def generate(self, inst):
+        if inst.name is None:
+            return self.__get_variable_idx()
+        else:
+            return self.__get_named_var_idx(inst.name)
+
 
 class Function(Validator):
     @verify(name=str, ftype=FunctionType)
@@ -20,25 +47,17 @@ class Function(Validator):
         if not isinstance(ftype, FunctionType):
             raise InvalidTypeException("Function Type expected")
 
-        self.__ftype = ftype
+        self.__type = ftype
         self.__arguments = [None] * len(ftype.arg_types)
-        self.__variable_index = 0
-        self.__named_variables = {}
+        self.__name_generator = NameGenerator()
 
-    def get_variable_idx(self):
-        current_idx = self.__variable_index
-        self.__variable_index += 1
-        return current_idx
+    @property
+    def type(self):
+        return self.__type
 
-    def get_named_var_idx(self, name):
-        new_name = name
-        if name in self.__named_variables:
-            new_name += str(self.__named_variables[name] + 1)
-            self.__named_variables[name] += 1
-        else:
-            self.__named_variables[name] = 0
-
-        return new_name
+    @property
+    def name_generator(self):
+        return self.__name_generator
 
     @property
     def basic_blocks(self):
@@ -118,7 +137,7 @@ class Function(Validator):
 
     def __str__(self):
         output_str = ""
-        output_str += "define " + str(self.__ftype.ret_type) + " " + self.__name + "("
+        output_str += "define " + str(self.__type.ret_type) + " " + self.__name + "("
 
         for count, arg in enumerate(self.__arguments):
             output_str += str(arg)
@@ -137,9 +156,9 @@ class Function(Validator):
     @verify(arg_list=list)
     def verify_args(self, arg_list):
        for idx, arg in enumerate(arg_list):
-            if not type(arg.type) ==  type(self.__ftype.arg_types[idx]):
+            if not type(arg.type) ==  type(self.__type.arg_types[idx]):
                 raise InvalidTypeException("Expected %s to be of type: %s but received type: %s" %
-                                           (arg.type, self.__ftype.arg_types[idx], type(arg.type)))
+                                           (arg.type, self.__type.arg_types[idx], type(arg.type)))
 
     def validate(self):
         for bb in self.__basic_blocks:
