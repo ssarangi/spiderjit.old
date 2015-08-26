@@ -121,11 +121,27 @@ class ReturnInstruction(Instruction):
 
 
 class SelectInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+    def __init__(self, cond, val1, val2, parent=None, name=None):
+        Instruction.__init__(self, [cond, val1, val2], parent, name)
+        self.__cond = cond
+        self.__val1 = val1
+        self.__val2 = val2
+
+    @property
+    def condition(self):
+        return self.__cond
+
+    @property
+    def val1(self):
+        return self.__val1
+
+    @property
+    def val2(self):
+        return self.__val2
 
     def __str__(self):
-        pass
+        output_str = "select " + str(self.__cond) + " " + str(self.__val1) + " " + str(self.__val2)
+        return output_str
 
 
 class LoadInstruction(Instruction):
@@ -185,6 +201,23 @@ class BinOpInstruction(Instruction):
         return output_str
 
 
+class AddInstruction(BinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_ADD, [lhs, rhs], parent, name)
+
+class SubInstruction(BinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_SUB, [lhs, rhs], parent, name)
+
+class MulInstruction(BinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_MUL, [lhs, rhs], parent, name)
+
+class DivInstruction(BinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_DIV, [lhs, rhs], parent, name)
+
+
 class FBinOpInstruction(Instruction):
     OP_ADD = 0
     OP_SUB = 1
@@ -224,6 +257,22 @@ class FBinOpInstruction(Instruction):
 
         output_str += render_list_with_parens(self.operands)
         return output_str
+
+class FAddInstruction(FBinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_ADD, [lhs, rhs], parent, name)
+
+class FSubInstruction(FBinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_SUB, [lhs, rhs], parent, name)
+
+class FMulInstruction(FBinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_MUL, [lhs, rhs], parent, name)
+
+class FDivInstruction(FBinOpInstruction):
+    def __init__(self, lhs, rhs, parent=None, name=None):
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_DIV, [lhs, rhs], parent, name)
 
 class AllocaInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -277,55 +326,6 @@ class SwitchInstruction(Instruction):
     def __str__(self):
         pass
 
-
-class ForInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
-class WhileInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
-class DoInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
-class IfInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
-class ElseInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
-class EndifInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-
 class SelectInstruction(Instruction):
     def __init__(self, parent=None, name=None):
         Instruction.__init__(self, [], parent, name)
@@ -333,14 +333,69 @@ class SelectInstruction(Instruction):
     def __str__(self):
         pass
 
+class CompareTypes:
+    EQ = 1
+    NE = 2
+    UGT = 3
+    UGE = 4
+    ULT = 5
+    ULE = 6
+    SGT = 7
+    SGE = 8
+    SLT = 9
+    SLE = 10
+
+    def get_str(self, compareTy):
+        if compareTy == CompareTypes.EQ: return "eq"
+        elif compareTy == CompareTypes.NE: return "ne"
+        elif compareTy == CompareTypes.UGT: return "ugt"
+        elif compareTy == CompareTypes.UGE: return "uge"
+        elif compareTy == CompareTypes.ULT: return "ult"
+        elif compareTy == CompareTypes.ULE: return "ule"
+        elif compareTy == CompareTypes.SGT: return "sgt"
+        elif compareTy == CompareTypes.SGE: return "sge"
+        elif compareTy == CompareTypes.SLT: return "slt"
+        elif compareTy == CompareTypes.SLE: return "sle"
 
 class CompareInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+    def __init__(self, cond, op1, op2, parent=None, name=None):
+        Instruction.__init__(self, [op1, op2], parent, name)
+        self.__condition = cond
+        self.__op1 = op1
+        self.__op2 = op2
+
+    @property
+    def condition(self):
+        return self.__condition
+
+    @property
+    def op1(self):
+        return self.op1
+
+    @property
+    def op2(self):
+        return self.op2
 
     def __str__(self):
         pass
 
+class ICmpInstruction(CompareInstruction):
+    def __init__(self, cond, op1, op2, parent=None, name=None):
+        CompareInstruction.__init__(cond, op1, op2, parent, name)
+
+    def __str__(self):
+        output_str = "icmp "
+        output_str += CompareTypes.get_str(self.condition)
+        output_str += " " + str(self.op1) + ", " + str(self.op2)
+
+class FCmpInstruction(CompareInstruction):
+    def __init__(self, cond, op1, op2, parent=None, name=None):
+        CompareInstruction.__init__(cond, op1, op2, parent, name)
+
+    def __str__(self):
+        output_str = "fcmp "
+        output_str += CompareTypes.get_str(self.condition)
+        output_str += " " + str(self.op1) + ", " + str(self.op2)
 
 class CastInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -373,6 +428,56 @@ class InsertElementInstruction(Instruction):
     def __str__(self):
         pass
 
+
+class BitwiseBinaryInstruction(Instruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+class ShiftLeftInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+class LogicalShiftRightInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+class ArithmeticShiftRightInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+
+class AndInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+class OrInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
+
+class XorInstruction(BitwiseBinaryInstruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, [], parent, name)
+
+    def __str__(self):
+        pass
 
 class BasicBlock(Validator):
     def __init__(self, name, parent):

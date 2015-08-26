@@ -37,6 +37,7 @@ def main():
     irbuilder.create_call(f1, IntConstant(32, 7), IntConstant(32, 2), name="call")
     irbuilder.create_call(f1, IntConstant(32, 9), IntConstant(32, 1), name="call")
     irbuilder.create_fadd(IntConstant(32, 4), IntConstant(32, 7))
+    irbuilder.create_mul(IntConstant(32, 3), IntConstant(32, 9), name="mymul")
     irbuilder.create_branch(bb_exit)
 
     irbuilder.insert_after(bb_exit)
