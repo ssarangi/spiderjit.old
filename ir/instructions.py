@@ -37,7 +37,7 @@ class Instruction(Value):
 
     @property
     def operands(self):
-        return tuple(self.operands)
+        return tuple(self.__operands)
 
     @property
     def needs_name(self):

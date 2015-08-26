@@ -109,7 +109,7 @@ class IRBuilder:
         self.__add_instruction(call_inst)
         return call_inst
 
-    def create_fadd(self, lhs, rhs):
-        fadd_inst = BinOpInstruction(BinOpInstruction.OP_ADD, lhs, rhs)
+    def create_fadd(self, lhs, rhs, name=None):
+        fadd_inst = BinOpInstruction(BinOpInstruction.OP_ADD, lhs, rhs, self.__current_bb, name)
         self.__add_instruction(fadd_inst)
         return fadd_inst
