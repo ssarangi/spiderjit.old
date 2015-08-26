@@ -203,19 +203,19 @@ class BinOpInstruction(Instruction):
 
 class AddInstruction(BinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        BinOpInstruction.__init__(self, BinOpInstruction.OP_ADD, [lhs, rhs], parent, name)
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_ADD, lhs, rhs, parent, name)
 
 class SubInstruction(BinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        BinOpInstruction.__init__(self, BinOpInstruction.OP_SUB, [lhs, rhs], parent, name)
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_SUB, lhs, rhs, parent, name)
 
 class MulInstruction(BinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        BinOpInstruction.__init__(self, BinOpInstruction.OP_MUL, [lhs, rhs], parent, name)
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_MUL, lhs, rhs, parent, name)
 
 class DivInstruction(BinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        BinOpInstruction.__init__(self, BinOpInstruction.OP_DIV, [lhs, rhs], parent, name)
+        BinOpInstruction.__init__(self, BinOpInstruction.OP_DIV, lhs, rhs, parent, name)
 
 
 class FBinOpInstruction(Instruction):
@@ -260,19 +260,19 @@ class FBinOpInstruction(Instruction):
 
 class FAddInstruction(FBinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_ADD, [lhs, rhs], parent, name)
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_ADD, lhs, rhs, parent, name)
 
 class FSubInstruction(FBinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_SUB, [lhs, rhs], parent, name)
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_SUB, lhs, rhs, parent, name)
 
 class FMulInstruction(FBinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_MUL, [lhs, rhs], parent, name)
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_MUL, lhs, rhs, parent, name)
 
 class FDivInstruction(FBinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
-        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_DIV, [lhs, rhs], parent, name)
+        FBinOpInstruction.__init__(self, FBinOpInstruction.OP_DIV, lhs, rhs, parent, name)
 
 class AllocaInstruction(Instruction):
     def __init__(self, parent=None, name=None):
