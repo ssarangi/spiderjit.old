@@ -104,7 +104,7 @@ class IRBuilder:
         branch_inst = BranchInstruction(bb)
         self.__add_instruction(branch_inst)
 
-    def create_call(self, func, *args):
-        call_inst = CallInstruction(func, list(args), self.__current_bb)
+    def create_call(self, func, *args, name=None):
+        call_inst = CallInstruction(func, list(args), self.__current_bb, name)
         self.__add_instruction(call_inst)
         return call_inst
