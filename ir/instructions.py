@@ -25,13 +25,19 @@ class InstructionList(list):
     def __add__(self, other):
         raise NotImplementedError("__add__ method not implemented for InstructionList")
 
+
 class Instruction(Value):
-    def __init__(self, parent=None, name=None, needs_name=True):
+    def __init__(self, operands = None, parent=None, name=None, needs_name=True):
         Value.__init__(self)
         self.__parent = parent
         self.__inst_idx = -1
         self.__name = name
         self.__needs_name = needs_name
+        self.__operands = operands
+
+    @property
+    def operands(self):
+        return tuple(self.operands)
 
     @property
     def needs_name(self):
@@ -61,10 +67,15 @@ class Instruction(Value):
     def name(self, n):
         self.__name = n
 
+    def __str__(self):
+        pass
+
+    __repr__ = __str__
+
 
 class CallInstruction(Instruction):
     def __init__(self, func, arg_list, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [func] + arg_list, parent, name)
         self.__func = func
 
         # Verify the Args
@@ -87,22 +98,18 @@ class CallInstruction(Instruction):
 
         return output_str
 
-    __repr__ = __str__
-
 
 class TerminateInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
 
-    __repr__ = __str__
-
 
 class ReturnInstruction(Instruction):
     def __init__(self, value=None, parent=None, name=None):
-        Instruction.__init__(self, parent, name, needs_name=False)
+        Instruction.__init__(self, [value], parent, name, needs_name=False)
         self.__value = value
 
     def __str__(self):
@@ -112,71 +119,131 @@ class ReturnInstruction(Instruction):
             output_str = "return " + str(self.__value)
         return output_str
 
-    __repr__ = __str__
 
 class SelectInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class LoadInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class StoreInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name, needs_name=False)
+        Instruction.__init__(self, [], parent, name, needs_name=False)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class BinOpInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+    OP_ADD = 0
+    OP_SUB = 1
+    OP_MUL = 2
+    OP_DIV = 3
+
+    def __init__(self, binop, lhs, rhs, parent=None, name=None):
+        Instruction.__init__(self, [lhs, rhs], parent, name)
+        self.__operator = binop
+        self.__lhs = lhs
+        self.__rhs = rhs
+
+    @property
+    def operator(self):
+        return self.__operator
+
+    @property
+    def lhs(self):
+        return self.__lhs
+
+    @property
+    def rhs(self):
+        return  self.__rhs
 
     def __str__(self):
-        pass
+        output_str = ""
+        if self.__operator == BinOpInstruction.OP_ADD:
+            output_str = "add"
+        elif self.__operator == BinOpInstruction.OP_SUB:
+            output_str = "sub"
+        elif self.__operator == BinOpInstruction.OP_MUL:
+            output_str = "mul"
+        elif self.__operator == BinOpInstruction.OP_DIV:
+            output_str = "div"
+        else:
+            raise InvalidTypeException("BinOp instruction expects, OP_ADD, OP_SUB, OP_MUL, OP_DIV")
 
-    __repr__ = __str__
+        output_str += render_list_with_parens(self.operands)
+        return output_str
 
+
+class FBinOpInstruction(Instruction):
+    OP_ADD = 0
+    OP_SUB = 1
+    OP_MUL = 2
+    OP_DIV = 3
+
+    def __init__(self, binop, lhs, rhs, parent=None, name=None):
+        Instruction.__init__(self, [lhs, rhs], parent, name)
+        self.__operator = binop
+        self.__lhs = lhs
+        self.__rhs = rhs
+
+    @property
+    def operator(self):
+        return self.__operator
+
+    @property
+    def lhs(self):
+        return self.__lhs
+
+    @property
+    def rhs(self):
+        return  self.__rhs
+
+    def __str__(self):
+        output_str = ""
+        if self.__operator == BinOpInstruction.OP_ADD:
+            output_str = "fadd"
+        elif self.__operator == BinOpInstruction.OP_SUB:
+            output_str = "fsub"
+        elif self.__operator == BinOpInstruction.OP_MUL:
+            output_str = "fmul"
+        elif self.__operator == BinOpInstruction.OP_DIV:
+            output_str = "fdiv"
+        else:
+            raise InvalidTypeException("FBinOp instruction expects, OP_ADD, OP_SUB, OP_MUL, OP_DIV")
+
+        output_str += render_list_with_parens(self.operands)
+        return output_str
 
 class AllocaInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class PhiInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
 
-    __repr__ = __str__
-
 
 class BranchInstruction(Instruction):
     def __init__(self, bb, parent=None, name=None):
-        Instruction.__init__(self, parent, name, needs_name=False)
+        Instruction.__init__(self, [bb], parent, name, needs_name=False)
         if not isinstance(bb, BasicBlock):
             raise InvalidTypeException("Expected a Basic Block type")
 
@@ -186,8 +253,6 @@ class BranchInstruction(Instruction):
         output_str = "br " + self.__bb.name
         return output_str
 
-    __repr__ = __str__
-
 
 class ConditionalBranchInstruction(BranchInstruction):
     def __init__(self, bb, parent=None, name=None):
@@ -195,8 +260,6 @@ class ConditionalBranchInstruction(BranchInstruction):
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class IndirectBranchInstruction(BranchInstruction):
@@ -206,137 +269,109 @@ class IndirectBranchInstruction(BranchInstruction):
     def __str__(self):
         pass
 
-    __repr__ = __str__
-
 
 class SwitchInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class ForInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class WhileInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class DoInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class IfInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class ElseInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class EndifInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class SelectInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class CompareInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class CastInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class GEPInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class ExtractElementInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class InsertElementInstruction(Instruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
-
-    __repr__ = __str__
 
 
 class BasicBlock(Validator):
