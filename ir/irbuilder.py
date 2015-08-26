@@ -16,6 +16,7 @@ class IRBuilder:
         self.__insertion_point_idx = 0
         self.__orphaned_instructions = []
         self.__context = context
+        self.__current_bb = None
 
     @property
     def module(self):
@@ -37,6 +38,7 @@ class IRBuilder:
         if isinstance(ip, BasicBlock):
             self.__insertion_point = ip
             self.__insertion_point_idx = 0
+            self.__current_bb = ip
         elif isinstance(ip, Instruction):
             self.__insertion_point = ip
             self.__insertion_point_idx = ip.parent.find_instruction_idx(ip)
@@ -51,6 +53,7 @@ class IRBuilder:
         if isinstance(ip, BasicBlock):
             self.__insertion_point = ip
             self.__insertion_point_idx = -1
+            self.__current_bb = ip
         elif isinstance(ip, Instruction):
             self.__insertion_point = ip
             self.__insertion_point_idx = ip.parent.find_instruction_idx(ip)
@@ -72,7 +75,7 @@ class IRBuilder:
             self.__insertion_point = inst
         elif isinstance(self.__insertion_point, Instruction):
             bb = self.__insertion_point.parent
-            bb.instructions.insert(self.__insertion_point_idx, inst)
+            bb.instructions.insert(self.__insertion_point_idx + 1, inst)
 
             self.__insertion_point_idx += 1
             self.__insertion_point = inst
@@ -100,3 +103,8 @@ class IRBuilder:
 
         branch_inst = BranchInstruction(bb)
         self.__add_instruction(branch_inst)
+
+    def create_call(self, func, *args):
+        call_inst = CallInstruction(func, list(args), self.__current_bb)
+        self.__add_instruction(call_inst)
+        return call_inst

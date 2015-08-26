@@ -5,9 +5,11 @@ from ir.types import *
 from ir.utils import *
 
 class Instruction(Value):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
         Value.__init__(self)
-        self.__parent = None
+        self.__parent = parent
+        self.__inst_idx = -1
+        self.__name = name
 
     @property
     def parent(self):
@@ -17,10 +19,31 @@ class Instruction(Value):
     def parent(self, bb):
         self.__parent = bb
 
+    @property
+    def inst_idx(self):
+        return self.__inst_idx
+
+    @inst_idx.setter
+    def inst_idx(self, v):
+        self.__inst_idx = v
+
+    @property
+    def name(self):
+        return self.__name
+
+    @name.setter
+    def name(self, n):
+        self.__name = n
+
+
 class CallInstruction(Instruction):
-    def __init__(self, func, *args):
+    def __init__(self, func, arg_list, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
         self.__func = func
-        self.__args = args
+
+        # Verify the Args
+        self.__func.verify_args(arg_list)
+        self.__args = arg_list
 
     @property
     def function(self):
@@ -30,46 +53,100 @@ class CallInstruction(Instruction):
     def args(self):
         return self.__args
 
-class TerminateInstruction(Instruction):
-    def __init__(self):
-        pass
+    def __str__(self):
+        output_str = "call @" + self.__func.render_signature()
+        return output_str
 
-class ReturnInstruction(Instruction):
-    def __init__(self):
-        pass
+    __repr__ = __str__
+
+
+class TerminateInstruction(Instruction):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
 
     def __str__(self):
-        output_str = "return void"
+        pass
+
+    __repr__ = __str__
+
+
+class ReturnInstruction(Instruction):
+    def __init__(self, value=None, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+        self.__value = value
+
+    def __str__(self):
+        if self.__value is None:
+            output_str = "return void"
+        else:
+            output_str = "return " + str(self.__value)
         return output_str
 
     __repr__ = __str__
 
 class SelectInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class LoadInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class StoreInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class BinOpInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class AllocaInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class PhiInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
 
+    __repr__ = __str__
+
+
 class BranchInstruction(Instruction):
-    def __init__(self, bb):
+    def __init__(self, bb, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
         if not isinstance(bb, BasicBlock):
             raise InvalidTypeException("Expected a Basic Block type")
 
@@ -82,70 +159,160 @@ class BranchInstruction(Instruction):
     __repr__ = __str__
 
 class ConditionalBranchInstruction(BranchInstruction):
-    def __init__(self):
+    def __init__(self, bb, parent=None, name=None):
+        BranchInstruction.__init__(self, bb, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class IndirectBranchInstruction(BranchInstruction):
-    def __init__(self):
+    def __init__(self, bb, parent=None, name=None):
+        BranchInstruction.__init__(self, bb, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class SwitchInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class ForInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class WhileInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class DoInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class IfInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class ElseInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class EndifInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class SelectInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class CompareInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class CastInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class GEPInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class ExtractElementInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
+
+    __repr__ = __str__
+
 
 class InsertElementInstruction(Instruction):
-    def __init__(self):
+    def __init__(self, parent=None, name=None):
+        Instruction.__init__(self, parent, name)
+
+    def __str__(self):
         pass
 
+    __repr__ = __str__
+
+
 class BasicBlock(Validator):
-    def __init__(self, name):
+    def __init__(self, name, parent=None):
         self.__name = name
         self.__instructions = []
-        self.parent = None
+        self.parent = parent
 
     @property
     def name(self):

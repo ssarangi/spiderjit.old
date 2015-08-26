@@ -6,6 +6,7 @@ import ir.instructions
 from ir.validator import *
 from ir.value import *
 
+
 class Function(Validator):
     @verify(name=str, ftype=FunctionType)
     def __init__(self, name, ftype):
@@ -21,6 +22,23 @@ class Function(Validator):
 
         self.__ftype = ftype
         self.__arguments = [None] * len(ftype.arg_types)
+        self.__variable_index = 0
+        self.__named_variables = {}
+
+    def get_variable_idx(self):
+        current_idx = self.__variable_index
+        self.__variable_index += 1
+        return current_idx
+
+    def get_named_var_idx(self, name):
+        new_name = name
+        if name in self.__named_variables:
+            new_name += str(self.__named_variables[name] + 1)
+            self.__named_variables[name] += 1
+        else:
+            self.__named_variables[name] = 0
+
+        return new_name
 
     @property
     def basic_blocks(self):
@@ -34,40 +52,48 @@ class Function(Validator):
     def args(self):
         return self.__arguments
 
-    @verify(arg=Argument)
-    def insert_arg(self, arg, idx = None):
-        if idx > len(self.__ftype.arg_types):
-            raise InvalidUsageModel("Invalid argument type. Function supports %s arguments but argument to be "
-                                    "added at index %s" % (len(self.__ftype.arg_types), idx))
+    @args.setter
+    def args(self, arg_list):
+        if not isinstance(arg_list, list):
+            raise InvalidTypeException("Expected arg_list to be a list")
 
-        # Check the function type for the number of args
-        arg_type_idx = -1
-        if idx is None:
-            # Check the length of the arguments.
-            arg_type_idx = len(self.__arguments)
-        else:
-            arg_type_idx = idx
+        self.verify_args(arg_list)
+        self.__arguments = arg_list
 
-        print(arg_type_idx)
-        # Now check if the index we got has the same type as the one in function type
-        arg_type = self.__ftype.arg_types[arg_type_idx]
-        # Make sure that the arg has the same type as the arg type
-        print(type(arg_type))
-        print(type(arg.type))
-        if not isinstance(arg.type, arg_type):
-            raise InvalidTypeException("Argument: " + str(arg) + " Expected: " + str(arg_type) + " Received: " + str(arg.type))
-
-        # Validate the arg
-        if not isinstance(arg, Argument):
-            raise InvalidTypeException("Argument type expected")
-
-        if idx is not None:
-            # Check if the argument list is already that size
-            if len(self.__arguments) > idx:
-                self.__arguments.insert(idx, arg)
-            else:
-                current_len = len(self.__arguments)
-                self.__arguments.append(arg)
+    # @verify(arg=Argument)
+    # def insert_arg(self, arg, idx = None):
+    #     if idx > len(self.__ftype.arg_types):
+    #         raise InvalidUsageModel("Invalid argument type. Function supports %s arguments but argument to be "
+    #                                 "added at index %s" % (len(self.__ftype.arg_types), idx))
+    #
+    #     # Check the function type for the number of args
+    #     arg_type_idx = -1
+    #     if idx is None:
+    #         # Check the length of the arguments.
+    #         arg_type_idx = len(self.__arguments)
+    #     else:
+    #         arg_type_idx = idx
+    #
+    #     print(arg_type_idx)
+    #     # Now check if the index we got has the same type as the one in function type
+    #     arg_type = self.__ftype.arg_types[arg_type_idx]
+    #     # Make sure that the arg has the same type as the arg type
+    #     print(type(arg_type))
+    #     print(type(arg.type))
+    #     if not isinstance(arg.type, arg_type):
+    #         raise InvalidTypeException("Argument: " + str(arg) + " Expected: " + str(arg_type) + " Received: " + str(arg.type))
+    #
+    #     # Validate the arg
+    #     if not isinstance(arg, Argument):
+    #         raise InvalidTypeException("Argument type expected")
+    #
+    #     if idx is not None:
+    #         # Check if the argument list is already that size
+    #         if len(self.__arguments) > idx:
+    #             self.__arguments.insert(idx, arg)
+    #         else:
+    #             current_len = len(self.__arguments)
+    #             self.__arguments.append(arg)
 
     @property
     def name(self):
@@ -77,13 +103,26 @@ class Function(Validator):
     def name(self, n):
         self.__name = n
 
+    def render_signature(self):
+        output_str = ""
+        output_str += "define " + str(self.__ftype.ret_type) + " " + self.__name + "("
+
+        for count, arg in enumerate(self.__arguments):
+            output_str += str(arg)
+            if count != len(self.__arguments) - 1:
+                output_str += ", "
+
+        output_str += ")"
+
+        return output_str
+
     def __str__(self):
         output_str = ""
         output_str += "define " + str(self.__ftype.ret_type) + " " + self.__name + "("
 
-        for count, arg_ty in enumerate(self.__ftype.arg_types):
-            output_str += str(arg_ty)
-            if count != len(self.__ftype.arg_types) - 1:
+        for count, arg in enumerate(self.__arguments):
+            output_str += str(arg)
+            if count != len(self.__arguments) - 1:
                 output_str += ", "
 
         output_str += ") {\n"
@@ -94,6 +133,13 @@ class Function(Validator):
 
         output_str += "}\n\n"
         return output_str
+
+    @verify(arg_list=list)
+    def verify_args(self, arg_list):
+       for idx, arg in enumerate(arg_list):
+            if not type(arg.type) ==  type(self.__ftype.arg_types[idx]):
+                raise InvalidTypeException("Expected %s to be of type: %s but received type: %s" %
+                                           (arg.type, self.__ftype.arg_types[idx], type(arg.type)))
 
     def validate(self):
         for bb in self.__basic_blocks:

@@ -30,7 +30,7 @@ class FloatType(BaseType):
         BaseType.__init__(self)
 
     def __str__(self):
-        return "f32"
+        return "float"
 
 class DoubleType(BaseType):
     def __init__(self):
