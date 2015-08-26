@@ -98,3 +98,17 @@ class FunctionType(BaseType):
     @property
     def arg_types(self):
         return self.__arg_types
+
+    def __str__(self):
+        final_output_str = str(self.__ret_type) + " ()* "
+
+        output_str = "("
+        for idx, i in enumerate(self.__arg_types):
+            output_str += str(i)
+            if idx < len(self.__arg_types) - 1:
+                output_str += ", "
+
+        output_str += ")"
+
+        final_output_str += output_str
+        return final_output_str

@@ -293,9 +293,6 @@ class PhiInstruction(Instruction):
 class BranchInstruction(Instruction):
     def __init__(self, bb, parent=None, name=None):
         Instruction.__init__(self, [bb], parent, name, needs_name=False)
-        if not isinstance(bb, BasicBlock):
-            raise InvalidTypeException("Expected a Basic Block type")
-
         self.__bb = bb
 
     def __str__(self):
@@ -430,29 +427,39 @@ class InsertElementInstruction(Instruction):
 
 
 class BitwiseBinaryInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        Instruction.__init__(self, [op1, op2], parent, name)
+        self.__op1 = op1
+        self.__op2 = op2
+
+    @property
+    def op1(self):
+        return self.__op1
+
+    @property
+    def op2(self):
+        return self.__op2
 
     def __str__(self):
         pass
 
 class ShiftLeftInstruction(BitwiseBinaryInstruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+        BitwiseBinaryInstruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
 
 class LogicalShiftRightInstruction(BitwiseBinaryInstruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+        BitwiseBinaryInstruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
 
 class ArithmeticShiftRightInstruction(BitwiseBinaryInstruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+        BitwiseBinaryInstruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
@@ -460,21 +467,21 @@ class ArithmeticShiftRightInstruction(BitwiseBinaryInstruction):
 
 class AndInstruction(BitwiseBinaryInstruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+        BitwiseBinaryInstruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
 
 class OrInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, op1, op2, parent, name)
 
     def __str__(self):
         pass
 
 class XorInstruction(BitwiseBinaryInstruction):
     def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
+        BitwiseBinaryInstruction.__init__(self, [], parent, name)
 
     def __str__(self):
         pass
@@ -503,9 +510,6 @@ class BasicBlock(Validator):
 
     @verify(inst=Instruction)
     def find_instruction_idx(self, inst):
-        if not isinstance(inst, Instruction):
-            raise InvalidTypeException("Expected an Instruction Type")
-
         for idx, i in enumerate(self.__instructions):
             if i == inst:
                 return idx
