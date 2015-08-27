@@ -6,11 +6,13 @@ from ir.irbuilder import *
 from ir.constants import *
 from optimizer.passmanager import *
 from optimizer.basicpass import *
+from pyjit.pretty_print import *
+from pyjit.decorators import *
 
 int32Ty = IntType(32)
 floatTy = FloatType()
 
-def main():
+def generate_ir():
     ctx = Context()
     mod = Module("MyModule", ctx)
     irbuilder = IRBuilder(mod, ctx)
@@ -58,5 +60,9 @@ def main():
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
 
+@autojit
+def add(a, b):
+    return a + b
+
 if __name__ == "__main__":
-    main()
+    pass
