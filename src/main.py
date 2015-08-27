@@ -68,4 +68,4 @@ def addup(n):
     return n
 
 if __name__ == "__main__":
-    pass
+    generate_ir()
