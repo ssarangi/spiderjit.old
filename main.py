@@ -61,8 +61,11 @@ def generate_ir():
     passmgr.run(mod)
 
 @autojit
-def add(a, b):
-    return a + b
+def addup(n):
+    x = 1
+    for i in range(n):
+        n += 1 + x
+    return n
 
 if __name__ == "__main__":
     pass
