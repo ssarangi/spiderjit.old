@@ -19,7 +19,7 @@ class InferType(object):
         return VarTy('$' + next(self.names))
 
     def visit(self, node):
-        name = "visit_%s" % (type(node).__name__)
+        name = "visit_%s" % type(node).__name__
         if hasattr(self, name):
             return getattr(self, name)(node)
         else:
@@ -100,7 +100,7 @@ class InferType(object):
         for n in node.body: self.visit(n)
 
     def generic_visit(self, node):
-        raise NotImplementedError
+        raise NotImplementedError("Visitor class doesn't implement %s" % type(node))
 
 #----------------------------------------------------------------------------------------------------------------------#
 

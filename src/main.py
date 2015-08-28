@@ -60,12 +60,27 @@ def generate_ir():
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
 
+# @autojit
+# def addup(n):
+#     x = 1
+#     for i in range(n):
+#         n += 1 + x
+#     return n
+
+# @autojit
+# def add(a, b):
+#     c = a + b
+#     return c
+
 @autojit
-def addup(n):
-    x = 1
-    for i in range(n):
-        n += 1 + x
-    return n
+def test_conditional():
+    var = 1
+    if var <= 2:
+        var = []
+    elif var == 3:
+        var = {}
+    else:
+        var = 'hi'
 
 if __name__ == "__main__":
     generate_ir()

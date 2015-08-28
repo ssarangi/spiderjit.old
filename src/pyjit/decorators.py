@@ -50,8 +50,10 @@ def specialize(ast, infer_ty, mgu):
 def autojit(fn):
     transformer = PythonVisitor()
     ast = transformer(fn)
-    (ty, mgu) = typeinfer(ast)
-    return specialize(ast, ty, mgu)
+    for n in ast.body:
+        print(n)
+    # (ty, mgu) = typeinfer(ast)
+    # return specialize(ast, ty, mgu)
 
 def typeinfer(ast):
     infer = InferType()

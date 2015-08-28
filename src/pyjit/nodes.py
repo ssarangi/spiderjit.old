@@ -3,6 +3,10 @@ __author__ = 'sarangis'
 import ast
 from functools import reduce
 
+class CompareOps:
+    LT = 0
+
+
 class Var(ast.AST):
     _fields = ["id", "type"]
 
@@ -25,6 +29,18 @@ class Return(ast.AST):
         self.val = val
 
 class Loop(ast.AST):
+    _fields = ["var", "begin", "end", "body"]
+
+    def __init__(self, var, begin, end, body):
+        self.var = var
+        self.begin = begin
+        self.end = end
+        self.body = body
+
+class Compare(ast.AST):
+    pass
+
+class If(ast.AST):
     _fields = ["var", "begin", "end", "body"]
 
     def __init__(self, var, begin, end, body):
@@ -97,7 +113,26 @@ class VarTy(object):
 
     def __eq__(self, other):
         if isinstance(other, VarTy):
-            return (self.s == other.s)
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return self.s
+
+    __repr__ = __str__
+
+
+class ListTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, VarTy):
+            return self.s == other.s
         else:
             return False
 
