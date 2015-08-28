@@ -3,6 +3,7 @@ __author__ = 'sarangis'
 from pyjit.visitors import *
 from pyjit.type_infer import *
 from pyjit.codegen import *
+import numpy as np
 
 def arg_pytype(arg):
     if isinstance(arg, np.ndarray):
