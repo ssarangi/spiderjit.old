@@ -40,19 +40,23 @@ class InferType(object):
         return None
 
     def visit_LitInt(self, node):
-        tv = self.fresh()
-        node.type = tv
-        return tv
+        #tv = self.fresh()
+        node.type = IntTy(node.s)
+        return node.type
 
     def visit_LitFloat(self, node):
-        tv = self.fresh()
-        node.type = tv
-        return tv
+        #tv = self.fresh()
+        node.type = FloatTy(node.s)
+        return node.type
 
     def visit_LitBool(self, node):
-        tv = self.fresh()
-        node.type = tv
-        return tv
+        #tv = self.fresh()
+        node.type = BoolTy(node.s)
+        return node.type
+
+    def visit_LitString(self, node):
+        node.type = StringTy(node.s)
+        return node.type
 
     def visit_Assign(self, node):
         ty = self.visit(node.val)
@@ -101,6 +105,20 @@ class InferType(object):
 
     def generic_visit(self, node):
         raise NotImplementedError("Visitor class doesn't implement %s" % type(node))
+
+#----------------------------------------------------------------------------------------------------------------------#
+from collections import deque
+
+class TypeSolver:
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def solve(type_constraints):
+        constraints = deque(type_constraints)
+        while len(constraints) > 0:
+            constraint = constraints.popleft()
+            print(constraint)
 
 #----------------------------------------------------------------------------------------------------------------------#
 

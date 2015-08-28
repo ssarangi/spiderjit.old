@@ -51,17 +51,24 @@ def specialize(ast, infer_ty, mgu):
 def autojit(fn):
     transformer = PythonVisitor()
     ast = transformer(fn)
-    for n in ast.body:
-        print(n)
-    # (ty, mgu) = typeinfer(ast)
-    # return specialize(ast, ty, mgu)
+    (ty, mgu) = typeinfer(ast)
+    return specialize(ast, ty, mgu)
 
 def typeinfer(ast):
     infer = InferType()
-    ty = infer.visit(ast)
-    mgu = solve(infer.constraints)
-    infer_ty = apply(mgu, ty)
-    return (infer_ty, mgu)
+    sig = infer.visit(ast)
+
+    print('Signature:%s \n' % sig)
+
+    print('Constraints:')
+    for (a,b) in infer.constraints:
+        print(a, '~', b)
+
+    # mgu = solve(infer.constraints)
+    TypeSolver.solve(infer.constraints)
+    # infer_ty = apply(mgu, sig)
+    # return (infer_ty, mgu)
+    return (None, None)
 
 def codegen(ast, specializer, retty, argtys):
     cgen = IREmitter(specializer, retty, argtys)

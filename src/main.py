@@ -72,15 +72,24 @@ def generate_ir():
 #     c = a + b
 #     return c
 
+# @autojit
+# def addone(a):
+#     return a + 1
+
 @autojit
-def test_conditional():
-    var = 1
-    if var <= 2:
-        var = []
-    elif var == 3:
-        var = {}
-    else:
-        var = 'hi'
+def addstring(a, b):
+    b = b + 1
+    return "hello" + a
+
+# @autojit
+# def test_conditional():
+#     var = 1
+#     if var <= 2:
+#         var = []
+#     elif var == 3:
+#         var = {}
+#     else:
+#         var = 'hi'
 
 if __name__ == "__main__":
     generate_ir()

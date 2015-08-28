@@ -65,24 +65,31 @@ class Func(ast.AST):
         self.body = body
 
 class LitInt(ast.AST):
-    _fields = ["n"]
+    _fields = ["s"]
 
-    def __init__(self, n, type=None):
-        self.n = n
+    def __init__(self, s, type=None):
+        self.s = s
         self.type = type
 
 class LitFloat(ast.AST):
-    _fields = ["n"]
+    _fields = ["s"]
 
-    def __init__(self, n, type=None):
-        self.n = n
-        self.type = None
+    def __init__(self, s, type=None):
+        self.s = s
+        self.type = type
 
 class LitBool(ast.AST):
+    _fields = ["s"]
+
+    def __init__(self, s):
+        self.s = s
+
+
+class LitString(ast.AST):
     _fields = ["n"]
 
-    def __init__(self, n):
-        self.n = n
+    def __init__(self, s):
+        self.s = s
 
 class Prim(ast.AST):
     _fields = ["fn", "args"]
@@ -104,6 +111,80 @@ class Noop(ast.AST):
 
 #----------------------------------------------------------------------------------------------------------------------#
 
+class IntTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, IntTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "IntTy { " + str(self.s) + " }"
+
+    __repr__ = __str__
+
+class FloatTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, IntTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "FloatTy { " + str(self.s) + " }"
+
+    __repr__ = __str__
+
+class BoolTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, IntTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "BoolTy { " + str(self.s) + " }"
+
+    __repr__ = __str__
+
+
+class StringTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, IntTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "StringTy { " + str(self.s) + " }"
+
+    __repr__ = __str__
+
+
 class VarTy(object):
     def __init__(self, s):
         self.s = s
@@ -118,7 +199,7 @@ class VarTy(object):
             return False
 
     def __str__(self):
-        return self.s
+        return "VarTy{ " + str(self.s) + " }"
 
     __repr__ = __str__
 
@@ -137,7 +218,45 @@ class ListTy(object):
             return False
 
     def __str__(self):
-        return self.s
+        return "ListTy {" + str(self.s) + " }"
+
+    __repr__ = __str__
+
+
+class DictTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, VarTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "DictTy {" + str(self.s) + " }"
+
+    __repr__ = __str__
+
+
+class TupleTy(object):
+    def __init__(self, s):
+        self.s = s
+
+    def __hash__(self):
+        return hash(self.s)
+
+    def __eq__(self, other):
+        if isinstance(other, VarTy):
+            return self.s == other.s
+        else:
+            return False
+
+    def __str__(self):
+        return "TupleTy {" + str(self.s) + " }"
 
     __repr__ = __str__
 
@@ -156,7 +275,7 @@ class ConstructorTy(object):
             return False
 
     def __str__(self):
-        return self.s
+        return "ConstructorTy {" + str(self.s) + " }"
 
     __repr__ = __str__
 

@@ -52,6 +52,9 @@ class PythonVisitor(ast.NodeVisitor):
     def visit_Bool(self, node):
         return LitBool(node.n)
 
+    def visit_Str(self, node):
+        return LitString(node.s)
+
     def visit_Call(self, node):
         name = self.visit(node.func)
         args = map(self.visit, node.args)
