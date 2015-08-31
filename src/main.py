@@ -77,9 +77,9 @@ def generate_ir():
 #     return a + 1
 
 @autojit
-def addstring(a, b):
-    b = b + 1
-    return "hello" + a
+def addstring(one, two):
+    two = two + "testx"
+    return "hello" + one + two
 
 # @autojit
 # def test_conditional():
