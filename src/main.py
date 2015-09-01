@@ -71,10 +71,10 @@ def generate_ir():
 #         n += 1 + x
 #     return n
 
-@autojit
-def add(a, b):
-    c = a + b
-    return c
+#@autojit
+#def add(a, b):
+#    c = a + b
+#    return c
 
 # @autojit
 # def addone(a):
