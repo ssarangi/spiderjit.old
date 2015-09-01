@@ -61,8 +61,14 @@ def generate_ir():
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
 
-    vm = VirtualMachine()
+    vm = x86VirtualMachine()
     vm.visit(mod)
+
+from codegen.pyasm2 import *
+def x86_emulate():
+    inst = mov(eax, 5)
+    print(inst)
+
 
 # @autojit
 # def addup(n):
@@ -96,4 +102,5 @@ def generate_ir():
 #         var = 'hi'
 
 if __name__ == "__main__":
-    generate_ir()
+    # generate_ir()
+    x86_emulate()
