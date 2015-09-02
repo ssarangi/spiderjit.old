@@ -1,0 +1,963 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>vm.vm &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for vm.vm</h1><div class="highlight"><pre>
+<span class="kn">import</span> <span class="nn">dis</span>
+<span class="kn">import</span> <span class="nn">operator</span>
+
+<span class="c"># Very good explanation comes from this link. https://ep2013.europython.eu/conference/talks/all-singing-all-dancing-python-bytecode</span>
+
+<span class="n">uninitialized</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="n">COMPARE_OPERATORS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
+    <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">y</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="n">y</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">y</span><span class="p">,</span>
+    <span class="k">lambda</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">issubclass</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span>
+    <span class="p">]</span>
+
+<div class="viewcode-block" id="BytecodeVM"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM">[docs]</a><span class="k">class</span> <span class="nc">BytecodeVM</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">__code__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__constants</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="o">.</span><span class="n">co_consts</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__names</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="o">.</span><span class="n">co_names</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__program</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="o">.</span><span class="n">co_code</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__nlocals</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="o">.</span><span class="n">co_nlocals</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__globals_dict</span> <span class="o">=</span> <span class="n">fn</span><span class="o">.</span><span class="n">__globals__</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__builtins_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__globals_dict</span><span class="p">[</span><span class="s">&#39;__builtins__&#39;</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__locals</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__locals</span> <span class="o">+=</span> <span class="n">args</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__locals</span> <span class="o">+=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__locals</span> <span class="o">+=</span> <span class="p">[</span><span class="n">uninitialized</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__nlocals</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">value</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__value</span>
+
+<div class="viewcode-block" id="BytecodeVM.print_members"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.print_members">[docs]</a>    <span class="k">def</span> <span class="nf">print_members</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">co_methods</span> <span class="o">=</span> <span class="p">[</span><span class="n">method</span> <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="nb">dir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="p">)</span> <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s">&quot;co_&quot;</span><span class="p">)]</span>
+    
+        <span class="k">for</span> <span class="n">method</span> <span class="ow">in</span> <span class="n">co_methods</span><span class="p">:</span>
+            <span class="n">m</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="p">,</span> <span class="n">method</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">&quot;Calling method: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">method</span><span class="p">)</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">_generate_opcode</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">bytecode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__code_object</span><span class="o">.</span><span class="n">co_code</span>
+        <span class="n">extended_arg</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">bytecode</span><span class="p">)</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">:</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">op</span> <span class="o">&gt;=</span> <span class="n">dis</span><span class="o">.</span><span class="n">HAVE_ARGUMENT</span><span class="p">:</span>
+                <span class="c"># when opcodes have arguments, the next 2 bytes represent the args.</span>
+                <span class="c"># the first byte is the LSB and the 2nd byte is the MSB. So the MSB </span>
+                <span class="c"># has to be shifted by 8 bits</span>
+                <span class="n">oparg</span> <span class="o">=</span> <span class="n">bytecode</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">|</span> <span class="p">(</span><span class="n">bytecode</span><span class="p">[</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">]</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">+</span> <span class="n">extended_arg</span>
+                <span class="n">extended_arg</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">op</span> <span class="o">==</span> <span class="n">dis</span><span class="o">.</span><span class="n">EXTENDED_ARG</span><span class="p">:</span>
+                    <span class="n">extended_arg</span> <span class="o">=</span> <span class="n">oparg</span> <span class="o">*</span> <span class="mi">65536</span>
+                    <span class="k">continue</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">oparg</span> <span class="o">=</span> <span class="bp">None</span>
+
+            <span class="k">yield</span><span class="p">(</span><span class="n">op</span><span class="p">,</span> <span class="n">oparg</span><span class="p">)</span>
+
+<div class="viewcode-block" id="BytecodeVM.execute"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute">[docs]</a>    <span class="k">def</span> <span class="nf">execute</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="n">op</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__program</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__ip</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">opmethod</span> <span class="o">=</span> <span class="s">&quot;execute_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">dis</span><span class="o">.</span><span class="n">opname</span><span class="p">[</span><span class="n">op</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">op</span> <span class="o">&gt;=</span> <span class="n">dis</span><span class="o">.</span><span class="n">HAVE_ARGUMENT</span><span class="p">:</span>
+                <span class="n">low</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__program</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__ip</span><span class="p">]</span>
+                <span class="n">high</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__program</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="n">oparg</span> <span class="o">=</span> <span class="p">(</span><span class="n">high</span> <span class="o">&lt;&lt;</span> <span class="mi">8</span><span class="p">)</span> <span class="o">|</span> <span class="n">low</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">+=</span> <span class="mi">2</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opmethod</span><span class="p">)):</span>
+                <span class="n">terminate</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">opmethod</span><span class="p">)(</span><span class="n">oparg</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">terminate</span><span class="p">:</span>
+                    <span class="k">break</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not found.&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">opmethod</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_NOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_NOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_NOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Do nothing code. Used as a placeholder by the bytecode optimizer.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_POP_TOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_POP_TOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_POP_TOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes the top-of-stack (TOS) item.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_ROT_TWO"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_ROT_TWO">[docs]</a>    <span class="k">def</span> <span class="nf">execute_ROT_TWO</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Swaps the two top-most stack items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_ROT_THREE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_ROT_THREE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_ROT_THREE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Lifts second and third stack item one position up, moves top down to position three.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DUP_TOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DUP_TOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DUP_TOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Duplicates the reference on top of the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DUP_TOP_TWO"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DUP_TOP_TWO">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DUP_TOP_TWO</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Duplicates the two references on top of the stack, leaving them in the same order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+    <span class="c"># Unary operations</span>
+    <span class="c"># Unary operations take the top of the stack, apply the operation, and push the result back on the stack.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNARY_POSITIVE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNARY_POSITIVE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNARY_POSITIVE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = +TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNARY_NEGATIVE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNARY_NEGATIVE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNARY_NEGATIVE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = -TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNARY_NOT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNARY_NOT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNARY_NOT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = not TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNARY_INVERT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNARY_INVERT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNARY_INVERT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = ~TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_GET_ITER"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_GET_ITER">[docs]</a>    <span class="k">def</span> <span class="nf">execute_GET_ITER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = iter(TOS).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+    <span class="c"># Binary operations</span>
+    <span class="c"># Binary operations remove the top of the stack (TOS) and the second top-most stack item (TOS1) from the stack.</span>
+    <span class="c"># They perform the operation, and put the result back on the stack.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_POWER"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_POWER">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_POWER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 ** TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_MULTIPLY"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_MULTIPLY">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_MULTIPLY</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 * TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_FLOOR_DIVIDE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_FLOOR_DIVIDE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_FLOOR_DIVIDE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 // TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_TRUE_DIVIDE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_TRUE_DIVIDE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_TRUE_DIVIDE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 / TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_MODULO"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_MODULO">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_MODULO</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 % TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_ADD"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_ADD">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_ADD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 + TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span> <span class="o">+</span> <span class="n">w</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_SUBTRACT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_SUBTRACT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_SUBTRACT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 - TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_SUBSCR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_SUBSCR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_SUBSCR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1[TOS].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_LSHIFT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_LSHIFT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_LSHIFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 &lt;&lt; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_RSHIFT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_RSHIFT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_RSHIFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 &gt;&gt; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_AND"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_AND">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_AND</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 &amp; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_XOR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_XOR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_XOR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 ^ TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BINARY_OR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BINARY_OR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BINARY_OR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS = TOS1 | TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+
+    <span class="c"># In-place operations</span>
+    <span class="c"># In-place operations are like binary operations, in that they remove TOS and TOS1, and push</span>
+    <span class="c"># the result back on the stack, but the operation is done in-place when TOS1 supports it, and</span>
+    <span class="c"># the resulting TOS may be (but does not have to be) the original TOS1.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_POWER"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_POWER">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_POWER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 ** TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_MULTIPLY"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_MULTIPLY">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_MULTIPLY</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 * TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_FLOOR_DIVIDE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_FLOOR_DIVIDE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_FLOOR_DIVIDE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 // TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_TRUE_DIVIDE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_TRUE_DIVIDE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_TRUE_DIVIDE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 / TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_MODULO"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_MODULO">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_MODULO</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 % TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_ADD"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_ADD">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_ADD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 + TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_SUBTRACT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_SUBTRACT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_SUBTRACT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 - TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_LSHIFT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_LSHIFT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_LSHIFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 &lt;&lt; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_RSHIFT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_RSHIFT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_RSHIFT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 &gt;&gt; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_AND"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_AND">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_AND</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 &amp; TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_XOR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_XOR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_XOR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 ^ TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_INPLACE_OR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_INPLACE_OR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_INPLACE_OR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements in-place TOS = TOS1 | TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_SUBSCR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_SUBSCR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_SUBSCR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS1[TOS] = TOS2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_SUBSCR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_SUBSCR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_SUBSCR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements del TOS1[TOS].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+
+    <span class="c"># Miscellaneous opcodes</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_PRINT_EXPR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_PRINT_EXPR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_PRINT_EXPR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements the expression statement for the interactive mode. TOS is removed from the</span>
+<span class="sd">        stack and printed. In non-interactive mode, an expression statement is terminated with POP_TOP.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BREAK_LOOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BREAK_LOOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BREAK_LOOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Terminates a loop due to a break statement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_CONTINUE_LOOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_CONTINUE_LOOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_CONTINUE_LOOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Continues a loop due to a continue statement. target is the address to jump to (which should be</span>
+<span class="sd">        a FOR_ITER instruction).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_SET_ADD"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_SET_ADD">[docs]</a>    <span class="k">def</span> <span class="nf">execute_SET_ADD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls set.add(TOS1[-i], TOS). Used to implement set comprehensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LIST_APPEND"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LIST_APPEND">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LIST_APPEND</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls list.append(TOS[-i], TOS). Used to implement list comprehensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_MAP_ADD"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_MAP_ADD">[docs]</a>    <span class="k">def</span> <span class="nf">execute_MAP_ADD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls dict.setitem(TOS1[-i], TOS, TOS1). Used to implement dict comprehensions.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+
+    <span class="c"># For all of the SET_ADD, LIST_APPEND and MAP_ADD instructions, while the added value or key/value pair</span>
+    <span class="c"># is popped off, the container object remains on the stack so that it is available for further iterations of the loop.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_RETURN_VALUE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_RETURN_VALUE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_RETURN_VALUE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">oparg</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns with TOS to the caller of the function.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__value</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">terminate</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="k">return</span> <span class="n">terminate</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_YIELD_VALUE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_YIELD_VALUE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_YIELD_VALUE</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pops TOS and yields it from a generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_YIELD_FROM"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_YIELD_FROM">[docs]</a>    <span class="k">def</span> <span class="nf">execute_YIELD_FROM</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pops TOS and delegates to it as a subiterator from a generator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+
+    <span class="c"># New in version 3.3.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_IMPORT_STAR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_IMPORT_STAR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_IMPORT_STAR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads all symbols not starting with &#39;_&#39; directly from the module TOS to the local namespace.</span>
+<span class="sd">        The module is popped after loading all names. This opcode implements from module import *.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_POP_BLOCK"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_POP_BLOCK">[docs]</a>    <span class="k">def</span> <span class="nf">execute_POP_BLOCK</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes one block from the block stack. Per frame, there is a stack of blocks, denoting nested loops,</span>
+<span class="sd">        try statements, and such.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_POP_EXCEPT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_POP_EXCEPT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_POP_EXCEPT</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Removes one block from the block stack. The popped block must be an exception handler block, as implicitly</span>
+<span class="sd">        created when entering an except handler. In addition to popping extraneous values from the frame stack,</span>
+<span class="sd">        the last three popped values are used to restore the exception state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_END_FINALLY"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_END_FINALLY">[docs]</a>    <span class="k">def</span> <span class="nf">execute_END_FINALLY</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Terminates a finally clause. The interpreter recalls whether the exception has to be re-raised, or whether</span>
+<span class="sd">        the function returns, and continues with the outer-next block.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_BUILD_CLASS"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_BUILD_CLASS">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_BUILD_CLASS</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes builtins.__build_class__() onto the stack. It is later called by CALL_FUNCTION to construct a class.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_SETUP_WITH"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_SETUP_WITH">[docs]</a>    <span class="k">def</span> <span class="nf">execute_SETUP_WITH</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This opcode performs several operations before a with block starts. First, it loads __exit__() from the </span>
+<span class="sd">        context manager and pushes it onto the stack for later use by WITH_CLEANUP. Then, __enter__() is called, and</span>
+<span class="sd">        a finally block pointing to delta is pushed. Finally, the result of calling the enter method is pushed onto the</span>
+<span class="sd">        stack. The next opcode will either ignore it (POP_TOP), or store it in (a) variable(s) (STORE_FAST, STORE_NAME,</span>
+<span class="sd">        or UNPACK_SEQUENCE).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_WITH_CLEANUP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_WITH_CLEANUP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_WITH_CLEANUP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Cleans up the stack when a with statement block exits. TOS is the context manager’s __exit__() bound method.</span>
+<span class="sd">        Below TOS are 1–3 values indicating how/why the finally clause was entered:</span>
+<span class="sd">        SECOND = None</span>
+<span class="sd">        (SECOND, THIRD) = (WHY_{RETURN,CONTINUE}), retval</span>
+<span class="sd">        SECOND = WHY_*; no retval below it</span>
+<span class="sd">        (SECOND, THIRD, FOURTH) = exc_info()</span>
+<span class="sd">        In the last case, TOS(SECOND, THIRD, FOURTH) is called, otherwise TOS(None, None, None). In addition, TOS is</span>
+<span class="sd">        removed from the stack.</span>
+
+<span class="sd">        If the stack represents an exception, and the function call returns a ‘true’ value, this information is “zapped”</span>
+<span class="sd">        and replaced with a single WHY_SILENCED to prevent END_FINALLY from re-raising the exception. (But non-local gotos</span>
+<span class="sd">        will still be resumed.)</span>
+
+<span class="sd">        All of the following opcodes expect arguments. An argument is two bytes, with the more significant byte last.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_NAME"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_NAME">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_NAME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements name = TOS. namei is the index of name in the attribute co_names of the code object. The compiler tries</span>
+<span class="sd">        to use STORE_FAST or STORE_GLOBAL if possible.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_NAME"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_NAME">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_NAME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements del name, where namei is the index into co_names attribute of the code object.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNPACK_SEQUENCE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNPACK_SEQUENCE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNPACK_SEQUENCE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Unpacks TOS into count individual values, which are put onto the stack right-to-left.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_UNPACK_EX"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_UNPACK_EX">[docs]</a>    <span class="k">def</span> <span class="nf">execute_UNPACK_EX</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">counts</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements assignment with a starred target: Unpacks an iterable in TOS into individual values, where the total number</span>
+<span class="sd">        of values can be smaller than the number of items in the iterable: one the new values will be a list of all leftover items.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+
+    <span class="c"># The low byte of counts is the number of values before the list value, the high byte of counts the number of values after it. The resulting values are put onto the stack right-to-left.</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_ATTR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_ATTR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_ATTR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements TOS.name = TOS1, where namei is the index of name in co_names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_ATTR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_ATTR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_ATTR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Implements del TOS.name, using namei as index into co_names.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_GLOBAL"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_GLOBAL">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_GLOBAL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Works as STORE_NAME, but stores the name as a global.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_GLOBAL"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_GLOBAL">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_GLOBAL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Works as DELETE_NAME, but deletes a global name.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_CONST"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_CONST">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_CONST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">consti</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes co_consts[consti] onto the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__constants</span><span class="p">[</span><span class="n">consti</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_NAME"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_NAME">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_NAME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes the value associated with co_names[namei] onto the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BUILD_TUPLE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BUILD_TUPLE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BUILD_TUPLE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a tuple consuming count items from the stack, and pushes the resulting tuple onto the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BUILD_LIST"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BUILD_LIST">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BUILD_LIST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Works as BUILD_TUPLE, but creates a list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BUILD_SET"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BUILD_SET">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BUILD_SET</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Works as BUILD_TUPLE, but creates a set.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BUILD_MAP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BUILD_MAP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BUILD_MAP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">count</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a new dictionary object onto the stack. The dictionary is pre-sized to hold count entries.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_ATTR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_ATTR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_ATTR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Replaces TOS with getattr(TOS, co_names[namei]).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_COMPARE_OP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_COMPARE_OP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_COMPARE_OP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compare_op</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Performs a Boolean operation. The operation name can be found in cmp_op[opname].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">w</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">COMPARE_OPERATORS</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">compare_op</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Compare Op </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">opname</span><span class="p">)</span>
+
+        <span class="n">value</span> <span class="o">=</span> <span class="n">COMPARE_OPERATORS</span><span class="p">[</span><span class="n">compare_op</span><span class="p">](</span><span class="n">v</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_IMPORT_NAME"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_IMPORT_NAME">[docs]</a>    <span class="k">def</span> <span class="nf">execute_IMPORT_NAME</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Imports the module co_names[namei]. TOS and TOS1 are popped and provide the fromlist and level arguments of __import__().</span>
+<span class="sd">        The module object is pushed onto the stack. The current namespace is not affected: for a proper import statement, a subsequent</span>
+<span class="sd">        STORE_FAST instruction modifies the namespace.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_IMPORT_FROM"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_IMPORT_FROM">[docs]</a>    <span class="k">def</span> <span class="nf">execute_IMPORT_FROM</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the attribute co_names[namei] from the module found in TOS. The resulting object is pushed onto the stack,</span>
+<span class="sd">        to be subsequently stored by a STORE_FAST instruction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_JUMP_FORWARD"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_JUMP_FORWARD">[docs]</a>    <span class="k">def</span> <span class="nf">execute_JUMP_FORWARD</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Increments bytecode counter by delta.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_POP_JUMP_IF_TRUE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_POP_JUMP_IF_TRUE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_POP_JUMP_IF_TRUE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If TOS is true, sets the bytecode counter to target. TOS is popped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_POP_JUMP_IF_FALSE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_POP_JUMP_IF_FALSE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_POP_JUMP_IF_FALSE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If TOS is false, sets the bytecode counter to target. TOS is popped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="n">target</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_JUMP_IF_TRUE_OR_POP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_JUMP_IF_TRUE_OR_POP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_JUMP_IF_TRUE_OR_POP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If TOS is true, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is false), TOS is popped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_JUMP_IF_FALSE_OR_POP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_JUMP_IF_FALSE_OR_POP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_JUMP_IF_FALSE_OR_POP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        If TOS is false, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is true), TOS is popped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_JUMP_ABSOLUTE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_JUMP_ABSOLUTE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_JUMP_ABSOLUTE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">target</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set bytecode counter to target.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_FOR_ITER"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_FOR_ITER">[docs]</a>    <span class="k">def</span> <span class="nf">execute_FOR_ITER</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        TOS is an iterator. Call its __next__() method. If this yields a new value, push it on the stack (leaving the iterator below it).</span>
+<span class="sd">        If the iterator indicates it is exhausted TOS is popped, and the byte code counter is incremented by delta.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_GLOBAL"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_GLOBAL">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_GLOBAL</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namei</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the global named co_names[namei] onto the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__names</span><span class="p">[</span><span class="n">namei</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__globals_dict</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__globals_dict</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__builtins_dict</span><span class="p">[</span><span class="n">name</span><span class="p">])</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_SETUP_LOOP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_SETUP_LOOP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_SETUP_LOOP</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a block for a loop onto the block stack. The block spans from the current instruction with a size of delta bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_SETUP_EXCEPT"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_SETUP_EXCEPT">[docs]</a>    <span class="k">def</span> <span class="nf">execute_SETUP_EXCEPT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a try block from a try-except clause onto the block stack. delta points to the first except block.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_SETUP_FINALLY"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_SETUP_FINALLY">[docs]</a>    <span class="k">def</span> <span class="nf">execute_SETUP_FINALLY</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a try block from a try-except clause onto the block stack. delta points to the finally block.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_MAP"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_MAP">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_MAP</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store a key and value pair in a dictionary. Pops the key and value while leaving the dictionary on the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_FAST"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_FAST">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_FAST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a reference to the local co_varnames[var_num] onto the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__locals</span><span class="p">[</span><span class="n">var_num</span><span class="p">])</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_FAST"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_FAST">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_FAST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stores TOS into the local co_varnames[var_num].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_FAST"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_FAST">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_FAST</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">var_num</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Deletes local co_varnames[var_num].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_CLOSURE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_CLOSURE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_CLOSURE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a reference to the cell contained in slot i of the cell and free variable storage. The name of the variable is</span>
+<span class="sd">        co_cellvars[i] if i is less than the length of co_cellvars. Otherwise it is co_freevars[i - len(co_cellvars)].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_DEREF"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_DEREF">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_DEREF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Loads the cell contained in slot i of the cell and free variable storage. Pushes a reference to the object the cell</span>
+<span class="sd">        contains on the stack.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_LOAD_CLASSDEREF"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_LOAD_CLASSDEREF">[docs]</a>    <span class="k">def</span> <span class="nf">execute_LOAD_CLASSDEREF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Much like LOAD_DEREF but first checks the locals dictionary before consulting the cell. This is used for loading free</span>
+<span class="sd">        variables in class bodies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_STORE_DEREF"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_STORE_DEREF">[docs]</a>    <span class="k">def</span> <span class="nf">execute_STORE_DEREF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Stores TOS into the cell contained in slot i of the cell and free variable storage.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_DELETE_DEREF"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_DELETE_DEREF">[docs]</a>    <span class="k">def</span> <span class="nf">execute_DELETE_DEREF</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Empties the cell contained in slot i of the cell and free variable storage. Used by the del statement.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_RAISE_VARARGS"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_RAISE_VARARGS">[docs]</a>    <span class="k">def</span> <span class="nf">execute_RAISE_VARARGS</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Raises an exception. argc indicates the number of parameters to the raise statement, ranging from 0 to 3. The handler will</span>
+<span class="sd">        find the traceback as TOS2, the parameter as TOS1, and the exception as TOS.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_CALL_FUNCTION"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_CALL_FUNCTION">[docs]</a>    <span class="k">def</span> <span class="nf">execute_CALL_FUNCTION</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls a function. The low byte of argc indicates the number of positional parameters, the high byte the number of keyword</span>
+<span class="sd">        parameters. On the stack, the opcode finds the keyword parameters first. For each keyword argument, the value is on top of</span>
+<span class="sd">        the key. Below the keyword parameters, the positional parameters are on the stack, with the right-most parameter on top. </span>
+<span class="sd">        Below the parameters, the function object to call is on the stack. Pops all function arguments, and the function itself off</span>
+<span class="sd">        the stack, and pushes the return value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">argc</span> <span class="o">&lt;</span> <span class="mi">255</span><span class="p">,</span> <span class="s">&quot;can&#39;t handle keyword arguments&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">argc</span><span class="p">)]</span>
+        <span class="nb">callable</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">vm</span> <span class="o">=</span> <span class="n">BytecodeVM</span><span class="p">(</span><span class="nb">callable</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">)</span>
+        <span class="n">vm</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">vm</span><span class="o">.</span><span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_MAKE_FUNCTION"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_MAKE_FUNCTION">[docs]</a>    <span class="k">def</span> <span class="nf">execute_MAKE_FUNCTION</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a new function object on the stack. From bottom to top, the consumed stack must consist of argc &amp; 0xFF default argument</span>
+<span class="sd">        objects in positional order (argc &gt;&gt; 8) &amp; 0xFF pairs of name and default argument, with the name just below the object on the</span>
+<span class="sd">        stack, for keyword-only parameters (argc &gt;&gt; 16) &amp; 0x7FFF parameter annotation objects a tuple listing the parameter names for the</span>
+<span class="sd">        annotations (only if there are ony annotation objects) the code associated with the function (at TOS1) the qualified name of the</span>
+<span class="sd">        function (at TOS)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_MAKE_CLOSURE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_MAKE_CLOSURE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_MAKE_CLOSURE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a new function object, sets its __closure__ slot, and pushes it on the stack. TOS is the qualified name of the function,</span>
+<span class="sd">        TOS1 is the code associated with the function, and TOS2 is the tuple containing cells for the closure’s free variables. argc is</span>
+<span class="sd">        interpreted as in MAKE_FUNCTION; the annotations and defaults are also in the same order below TOS2.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_BUILD_SLICE"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_BUILD_SLICE">[docs]</a>    <span class="k">def</span> <span class="nf">execute_BUILD_SLICE</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Pushes a slice object on the stack. argc must be 2 or 3. If it is 2, slice(TOS1, TOS) is pushed; if it is 3, slice(TOS2, TOS1, TOS)</span>
+<span class="sd">        is pushed. See the slice() built-in function for more information.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_EXTENDED_ARG"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_EXTENDED_ARG">[docs]</a>    <span class="k">def</span> <span class="nf">execute_EXTENDED_ARG</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ext</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prefixes any opcode which has an argument too big to fit into the default two bytes. ext holds two additional bytes which, taken</span>
+<span class="sd">        together with the subsequent opcode’s argument, comprise a four-byte argument, ext being the two most-significant bytes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_CALL_FUNCTION_VAR"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR">[docs]</a>    <span class="k">def</span> <span class="nf">execute_CALL_FUNCTION_VAR</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the variable argument list,</span>
+<span class="sd">        followed by keyword and positional arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_CALL_FUNCTION_KW"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_CALL_FUNCTION_KW">[docs]</a>    <span class="k">def</span> <span class="nf">execute_CALL_FUNCTION_KW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,</span>
+<span class="sd">        followed by explicit keyword and positional arguments.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="BytecodeVM.execute_CALL_FUNCTION_VAR_KW"><a class="viewcode-back" href="../../vm.html#vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR_KW">[docs]</a>    <span class="k">def</span> <span class="nf">execute_CALL_FUNCTION_VAR_KW</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">argc</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,</span>
+<span class="sd">        followed by the variable-arguments tuple, followed by explicit keyword and positional arguments.            </span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Method </span><span class="si">%s</span><span class="s"> not implemented&quot;</span> <span class="o">%</span> <span class="n">sys</span><span class="o">.</span><span class="n">_getframe</span><span class="p">()</span><span class="o">.</span><span class="n">f_code</span><span class="o">.</span><span class="n">co_name</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
