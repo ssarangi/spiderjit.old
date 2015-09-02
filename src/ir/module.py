@@ -14,6 +14,7 @@ class Module(Validator):
         self.__func_declarations = []
         self.__data_layout = []
         self.__target_arch = ""
+        self.__entry_point = None
 
     @property
     def globals(self):

@@ -90,15 +90,19 @@ class IRBuilder:
         f = Function(name, ftype)
         return f
 
+    def set_entry_point(self, function):
+        self.__module.entry_point = function
+
     def create_global(self, name, initializer):
         g = Global(name, initializer)
         self.__module.add_global(g)
 
     def create_basic_block(self, name, parent):
-        return BasicBlock(name, parent)
+        bb = BasicBlock(name, parent)
+        return bb
 
     def create_return(self, value = None):
-        ret_inst = ReturnInstruction()
+        ret_inst = ReturnInstruction(value)
         self.__add_instruction(ret_inst)
 
     def create_branch(self, bb):
@@ -107,6 +111,12 @@ class IRBuilder:
 
         branch_inst = BranchInstruction(bb)
         self.__add_instruction(branch_inst)
+        return branch_inst
+
+    def create_cond_branch(self, cmp_inst, value, bb_true, bb_false):
+        cond_branch = ConditionalBranchInstruction(cmp_inst, value, bb_true, bb_false)
+        self.__add_instruction(cond_branch)
+        return cond_branch
 
     def create_call(self, func, *args, name=None):
         call_inst = CallInstruction(func, list(args), self.__current_bb, name)
@@ -152,3 +162,8 @@ class IRBuilder:
         fdiv_inst = FDivInstruction(lhs, rhs, self.__current_bb, name)
         self.__add_instruction(fdiv_inst)
         return fdiv_inst
+
+    def create_icmp(self, lhs, rhs, name=None):
+        icmp_inst = ICmpInstruction(CompareTypes.SLE, lhs, rhs, self.__current_bb, name)
+        self.__add_instruction(icmp_inst)
+        return icmp_inst

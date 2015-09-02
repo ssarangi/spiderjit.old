@@ -3,6 +3,7 @@ __author__ = 'sarangis'
 from ir.value import *
 from ir.types import *
 from ir.utils import *
+from ir.constants import *
 
 class InstructionList(list):
     def __init__(self, name_generator):
@@ -61,7 +62,10 @@ class Instruction(Value):
 
     @property
     def name(self):
-        return self.__name
+        if self.__name == None:
+            return None
+
+        return "%" + self.__name
 
     @name.setter
     def name(self, n):
@@ -81,6 +85,11 @@ class CallInstruction(Instruction):
         # Verify the Args
         self.__func.verify_args(arg_list)
         self.__args = arg_list
+        self.__type = self.__func.type
+
+    @property
+    def type(self):
+        return self.__type
 
     @property
     def function(self):
@@ -112,9 +121,15 @@ class ReturnInstruction(Instruction):
         Instruction.__init__(self, [value], parent, name, needs_name=False)
         self.__value = value
 
+    @property
+    def value(self):
+        return self.__value
+
     def __str__(self):
         if self.__value is None:
             output_str = "return void"
+        elif hasattr(self.__value, "name"):
+            output_str = "return " + str(self.__value.name)
         else:
             output_str = "return " + str(self.__value)
         return output_str
@@ -171,6 +186,11 @@ class BinOpInstruction(Instruction):
         self.__operator = binop
         self.__lhs = lhs
         self.__rhs = rhs
+        self.__type = self.__lhs.type
+
+    @property
+    def type(self):
+        return self.__type
 
     @property
     def operator(self):
@@ -301,11 +321,35 @@ class BranchInstruction(Instruction):
 
 
 class ConditionalBranchInstruction(BranchInstruction):
-    def __init__(self, bb, parent=None, name=None):
-        BranchInstruction.__init__(self, bb, parent, name)
+    def __init__(self, cmp_inst, value, bb_true, bb_false, parent=None, name=None):
+        BranchInstruction.__init__(self, None, parent, name)
+        self.__cmp_inst = cmp_inst
+        self.__value = value
+        self.__bb_true = bb_true
+        self.__bb_false = bb_false
+
+    @property
+    def cmp_inst(self):
+        return self.__cmp_inst
+
+    @property
+    def cmp_value(self):
+        return self.__value
+
+    @property
+    def bb_true(self):
+        return self.__bb_true
+
+    @property
+    def bb_false(self):
+        return self.__bb_false
 
     def __str__(self):
-        pass
+        output_str = "br %"
+        output_str += self.__cmp_inst.name + " "
+        output_str += str(self.__value) + ","
+        output_str += " label %" + str(self.__bb_true.name) + ", label %" + str(self.__bb_false.name)
+        return output_str
 
 
 class IndirectBranchInstruction(BranchInstruction):
@@ -342,7 +386,8 @@ class CompareTypes:
     SLT = 9
     SLE = 10
 
-    def get_str(self, compareTy):
+    @staticmethod
+    def get_str(compareTy):
         if compareTy == CompareTypes.EQ: return "eq"
         elif compareTy == CompareTypes.NE: return "ne"
         elif compareTy == CompareTypes.UGT: return "ugt"
@@ -367,32 +412,37 @@ class CompareInstruction(Instruction):
 
     @property
     def op1(self):
-        return self.op1
+        return self.__op1
 
     @property
     def op2(self):
-        return self.op2
+        return self.__op2
 
     def __str__(self):
         pass
 
+
 class ICmpInstruction(CompareInstruction):
     def __init__(self, cond, op1, op2, parent=None, name=None):
-        CompareInstruction.__init__(cond, op1, op2, parent, name)
+        CompareInstruction.__init__(self, cond, op1, op2, parent, name)
 
     def __str__(self):
         output_str = "icmp "
         output_str += CompareTypes.get_str(self.condition)
         output_str += " " + str(self.op1) + ", " + str(self.op2)
+        return output_str
+
 
 class FCmpInstruction(CompareInstruction):
     def __init__(self, cond, op1, op2, parent=None, name=None):
-        CompareInstruction.__init__(cond, op1, op2, parent, name)
+        CompareInstruction.__init__(self, cond, op1, op2, parent, name)
 
     def __str__(self):
         output_str = "fcmp "
         output_str += CompareTypes.get_str(self.condition)
         output_str += " " + str(self.op1) + ", " + str(self.op2)
+        return output_str
+
 
 class CastInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -532,7 +582,7 @@ class BasicBlock(Validator):
             output_str += "\t"
 
             if i.name is not None:
-                output_str += "%" + i.name + " = "
+                output_str += i.name + " = "
 
             output_str += str(i) + "\n"
 

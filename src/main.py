@@ -10,7 +10,7 @@ from pyjit.pretty_print import *
 from pyjit.decorators import *
 from vm.vm import *
 from ir.interpreter import *
-from tests.fib import *
+from pytests.fib import *
 
 int32Ty = IntType(32)
 floatTy = FloatType()
@@ -23,43 +23,51 @@ def generate_ir():
     irbuilder.create_global("first_global", IntConstant(32, 4))
     irbuilder.create_global("second_global", IntConstant(32, 9))
 
-    ft = irbuilder.create_function_type(int32Ty, floatTy, floatTy)
-    f = irbuilder.create_function("test_fn", ft)
+    # Create the fibonacci function
+    ft1 = irbuilder.create_function_type(int32Ty, int32Ty)
+    irfib = irbuilder.create_function("fib", ft1)
+    n_arg = Argument(int32Ty, "n")
+    irfib.args = [n_arg]
 
-    ft1 = irbuilder.create_function_type(int32Ty, int32Ty, int32Ty)
-    f1 = irbuilder.create_function("foo", ft1)
+    entry_bb = irbuilder.create_basic_block("entry", irfib)
+    irfib.basic_blocks.append(entry_bb)
+    irbuilder.insert_after(entry_bb)
+    # Now add a icmp instruction
+    icmp = irbuilder.create_icmp(n_arg, IntConstant(32, 1))
+    ifcont = irbuilder.create_basic_block("if-cont", irfib)
+    thenblock = irbuilder.create_basic_block("then", irfib)
+    irbuilder.create_cond_branch(icmp, True, ifcont, thenblock)
+    irfib.basic_blocks.append(ifcont)
+    irfib.basic_blocks.append(thenblock)
 
-    arg0 = Argument(floatTy, "myarg")
-    arg1 = Argument(floatTy, "myarg1")
-    f.args = [arg0, arg1]
+    irbuilder.insert_after(ifcont)
+    irbuilder.create_return(IntConstant(32, 1))
 
-    arg2 = Argument(int32Ty, "a")
-    arg3 = Argument(int32Ty, "b")
-    f1.args = [arg2, arg3]
+    irbuilder.insert_after(thenblock)
+    n_minus_1 = irbuilder.create_sub(n_arg, IntConstant(32, 1))
+    n_minus_2 = irbuilder.create_sub(n_arg, IntConstant(32, 2))
+    call1 = irbuilder.create_call(irfib, n_minus_1)
+    call2 = irbuilder.create_call(irfib, n_minus_2)
+    final_res = irbuilder.create_add(call1, call2)
+    irbuilder.create_return(final_res)
 
+    # Create the main entry point
+    ft = irbuilder.create_function_type(int32Ty)
+    f = irbuilder.create_function("main", ft)
     bb = irbuilder.create_basic_block("entry", f)
     f.basic_blocks.append(bb)
-    bb_exit = irbuilder.create_basic_block("exit", f)
-    f.basic_blocks.append(bb_exit)
 
     irbuilder.insert_after(bb)
-    irbuilder.create_call(f1, IntConstant(32, 5), IntConstant(32, 3))
-    irbuilder.create_call(f1, IntConstant(32, 7), IntConstant(32, 2), name="call")
-    irbuilder.create_call(f1, IntConstant(32, 9), IntConstant(32, 1), name="call")
-    irbuilder.create_fadd(IntConstant(32, 4), IntConstant(32, 7))
-    irbuilder.create_mul(IntConstant(32, 3), IntConstant(32, 9), name="mymul")
-    irbuilder.create_mul(IntConstant(32, 6), IntConstant(32, 5), name="mymul")
-    irbuilder.create_branch(bb_exit)
-
-    irbuilder.insert_after(bb_exit)
-    irbuilder.create_return()
+    call_fib = irbuilder.create_call(irfib, IntConstant(32, 9))
+    irbuilder.create_return(call_fib)
 
     mod.functions.append(f)
-    mod.functions.append(f1)
+    mod.functions.append(irfib)
+    print("-" * 100)
     print(mod)
     mod.validate()
 
-    mod.entry_point(f)
+    mod.entry_point = f
 
     print("Running Passmanager:")
     print("-" * 50)
@@ -70,6 +78,7 @@ def generate_ir():
 
     irvm = IRVirtualMachine()
     irvm.visit(mod)
+    print(irvm.eval_result)
 
 # @autojit
 # def addup(n):

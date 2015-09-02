@@ -18,20 +18,32 @@ class IntConstant(Constant):
         self.__initializer = initializer
 
     @property
+    def initializer(self):
+        return self.__initializer
+
+    @property
+    def name(self):
+        return str(self.__initializer)
+
+    @property
     def type(self):
         return self.__type
 
     def __str__(self):
         return str(self.__type) + " " + str(self.__initializer)
 
-    @property
-    def type(self):
-        return self.__type
-
 class FloatConstant(Constant):
     def __init__(self, initializer):
         Constant.__init__(self)
         self.__initializer = initializer
+
+    @property
+    def initializer(self):
+        return self.__initializer
+
+    @property
+    def name(self):
+        return str(self.__initializer)
 
     @property
     def type(self):
@@ -47,6 +59,14 @@ class DoubleConstant(Constant):
         self.__initializer = initializer
 
     @property
+    def initializer(self):
+        return self.__initializer
+
+    @property
+    def name(self):
+        return str(self.__initializer)
+
+    @property
     def type(self):
         return self.__type
 
@@ -57,6 +77,14 @@ class DoubleConstant(Constant):
 class StrConstant(Constant):
     def __init__(self):
         Constant.__init__(self)
+
+    @property
+    def initializer(self):
+        return self.__initializer
+
+    @property
+    def name(self):
+        return str(self.__initializer)
 
     @property
     def type(self):
