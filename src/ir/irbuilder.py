@@ -1,4 +1,4 @@
-__author__ = 'sarangis'
+﻿__author__ = 'sarangis'
 
 from ir.types import *
 from ir.function import *
@@ -89,6 +89,10 @@ class IRBuilder:
     def create_function(self, name, ftype, *args):
         f = Function(name, ftype)
         return f
+
+    def create_global(self, name, initializer):
+        g = Global(name, initializer)
+        self.__module.add_global(g)
 
     def create_basic_block(self, name, parent):
         return BasicBlock(name, parent)

@@ -9,6 +9,7 @@ from optimizer.basicpass import *
 from pyjit.pretty_print import *
 from pyjit.decorators import *
 from vm.vm import *
+from ir.interpreter import *
 from tests.fib import *
 
 int32Ty = IntType(32)
@@ -18,6 +19,9 @@ def generate_ir():
     ctx = Context()
     mod = Module("MyModule", ctx)
     irbuilder = IRBuilder(mod, ctx)
+
+    irbuilder.create_global("first_global", IntConstant(32, 4))
+    irbuilder.create_global("second_global", IntConstant(32, 9))
 
     ft = irbuilder.create_function_type(int32Ty, floatTy, floatTy)
     f = irbuilder.create_function("test_fn", ft)
@@ -55,12 +59,17 @@ def generate_ir():
     print(mod)
     mod.validate()
 
+    mod.entry_point(f)
+
     print("Running Passmanager:")
     print("-" * 50)
     passmgr = PassManager()
     passmgr.add_module_pass(PrintFunctionsPass())
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
+
+    irvm = IRVirtualMachine()
+    irvm.visit(mod)
 
 # @autojit
 # def addup(n):
@@ -107,3 +116,4 @@ def test_bytecode_vm():
 if __name__ == "__main__":
     # generate_ir()
     test_bytecode_vm()
+    generate_ir()

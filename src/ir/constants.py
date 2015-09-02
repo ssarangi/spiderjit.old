@@ -1,4 +1,4 @@
-__author__ = 'sarangis'
+﻿__author__ = 'sarangis'
 
 from ir.value import *
 
@@ -16,6 +16,10 @@ class IntConstant(Constant):
         Constant.__init__(self)
         self.__type = IntType(bits)
         self.__initializer = initializer
+
+    @property
+    def type(self):
+        return self.__type
 
     def __str__(self):
         return str(self.__type) + " " + str(self.__initializer)
