@@ -23,6 +23,9 @@
 
     <!-- Custom styles for this template -->
     <link href="main_page_res/css/carousel.css" rel="stylesheet">
+    <link href="main_page_res/css/monokai_sublime.css" rel="stylesheet">
+    <script src="main_page_res/js/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
   </head>
 <!-- NAVBAR
 ================================================== -->
@@ -155,7 +158,9 @@
       <div class="row featurette">
         <div class="col-md-7">
           <h2 class="featurette-heading">First featurette heading. <span class="text-muted">It'll blow your mind.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+          <pre><code class="python">def foo(a, b):
+  return a + b
+          </code></pre>
         </div>
         <div class="col-md-5">
           <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
