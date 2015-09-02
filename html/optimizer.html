@@ -1,0 +1,398 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>optimizer package &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="index.html" />
+    <link rel="next" title="pyjit package" href="pyjit.html" />
+    <link rel="prev" title="main module" href="main.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="pyjit.html" title="pyjit package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="main.html" title="main module"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="optimizer-package">
+<h1>optimizer package<a class="headerlink" href="#optimizer-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-optimizer.basicpass">
+<span id="optimizer-basicpass-module"></span><h2>optimizer.basicpass module<a class="headerlink" href="#module-optimizer.basicpass" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="optimizer.basicpass.PrintBasicBlocksPass">
+<em class="property">class </em><code class="descclassname">optimizer.basicpass.</code><code class="descname">PrintBasicBlocksPass</code><a class="reference internal" href="_modules/optimizer/basicpass.html#PrintBasicBlocksPass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.basicpass.PrintBasicBlocksPass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimizer.pass_support.FunctionPass" title="optimizer.pass_support.FunctionPass"><code class="xref py py-class docutils literal"><span class="pre">optimizer.pass_support.FunctionPass</span></code></a></p>
+<dl class="method">
+<dt id="optimizer.basicpass.PrintBasicBlocksPass.run_on_function">
+<code class="descname">run_on_function</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.basicpass.PrintBasicBlocksPass.run_on_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="optimizer.basicpass.PrintFunctionsPass">
+<em class="property">class </em><code class="descclassname">optimizer.basicpass.</code><code class="descname">PrintFunctionsPass</code><a class="reference internal" href="_modules/optimizer/basicpass.html#PrintFunctionsPass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.basicpass.PrintFunctionsPass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#optimizer.pass_support.ModulePass" title="optimizer.pass_support.ModulePass"><code class="xref py py-class docutils literal"><span class="pre">optimizer.pass_support.ModulePass</span></code></a></p>
+<dl class="method">
+<dt id="optimizer.basicpass.PrintFunctionsPass.run_on_module">
+<code class="descname">run_on_module</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.basicpass.PrintFunctionsPass.run_on_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-optimizer.pass_support">
+<span id="optimizer-pass-support-module"></span><h2>optimizer.pass_support module<a class="headerlink" href="#module-optimizer.pass_support" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="optimizer.pass_support.FunctionPass">
+<em class="property">class </em><code class="descclassname">optimizer.pass_support.</code><code class="descname">FunctionPass</code><a class="reference internal" href="_modules/optimizer/pass_support.html#FunctionPass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.FunctionPass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="optimizer.pass_support.FunctionPass.run_on_function">
+<code class="descname">run_on_function</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#FunctionPass.run_on_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.FunctionPass.run_on_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="optimizer.pass_support.InstVisitorPass">
+<em class="property">class </em><code class="descclassname">optimizer.pass_support.</code><code class="descname">InstVisitorPass</code><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.generic_visit">
+<code class="descname">generic_visit</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.generic_visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.generic_visit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit">
+<code class="descname">visit</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_addinstruction">
+<code class="descname">visit_addinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_addinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_addinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_allocainstruction">
+<code class="descname">visit_allocainstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_allocainstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_allocainstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_andinstruction">
+<code class="descname">visit_andinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_andinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_andinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_arithmeticshiftrightinstruction">
+<code class="descname">visit_arithmeticshiftrightinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_arithmeticshiftrightinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_arithmeticshiftrightinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_basicblock">
+<code class="descname">visit_basicblock</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_basicblock"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_basicblock" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_branchinstruction">
+<code class="descname">visit_branchinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_branchinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_branchinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_callinstruction">
+<code class="descname">visit_callinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_callinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_callinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_castinstruction">
+<code class="descname">visit_castinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_castinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_castinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_conditionalbranchinstruction">
+<code class="descname">visit_conditionalbranchinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_conditionalbranchinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_conditionalbranchinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_divinstruction">
+<code class="descname">visit_divinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_divinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_divinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_extractelementinstruction">
+<code class="descname">visit_extractelementinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_extractelementinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_extractelementinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_faddinstruction">
+<code class="descname">visit_faddinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_faddinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_faddinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_fcmpinstruction">
+<code class="descname">visit_fcmpinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_fcmpinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_fcmpinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_fdivinstruction">
+<code class="descname">visit_fdivinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_fdivinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_fdivinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_fmulinstruction">
+<code class="descname">visit_fmulinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_fmulinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_fmulinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_fsubinstruction">
+<code class="descname">visit_fsubinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_fsubinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_fsubinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_function">
+<code class="descname">visit_function</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_function"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_function" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_gepinstruction">
+<code class="descname">visit_gepinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_gepinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_gepinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_icmpinstruction">
+<code class="descname">visit_icmpinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_icmpinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_icmpinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_indirectbranchinstruction">
+<code class="descname">visit_indirectbranchinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_indirectbranchinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_indirectbranchinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_insertelementinstruction">
+<code class="descname">visit_insertelementinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_insertelementinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_insertelementinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_loadinstruction">
+<code class="descname">visit_loadinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_loadinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_loadinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_logicalshiftrightinstruction">
+<code class="descname">visit_logicalshiftrightinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_logicalshiftrightinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_logicalshiftrightinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_module">
+<code class="descname">visit_module</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_mulinstruction">
+<code class="descname">visit_mulinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_mulinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_mulinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_orinstruction">
+<code class="descname">visit_orinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_orinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_orinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_phiinstruction">
+<code class="descname">visit_phiinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_phiinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_phiinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_returninstruction">
+<code class="descname">visit_returninstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_returninstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_returninstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_selectinstruction">
+<code class="descname">visit_selectinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_selectinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_selectinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_shiftleftinstruction">
+<code class="descname">visit_shiftleftinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_shiftleftinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_shiftleftinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_storeinstruction">
+<code class="descname">visit_storeinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_storeinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_storeinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_subinstruction">
+<code class="descname">visit_subinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_subinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_subinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_switchinstruction">
+<code class="descname">visit_switchinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_switchinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_switchinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_terminateinstruction">
+<code class="descname">visit_terminateinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_terminateinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_terminateinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.pass_support.InstVisitorPass.visit_xorinstruction">
+<code class="descname">visit_xorinstruction</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#InstVisitorPass.visit_xorinstruction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.InstVisitorPass.visit_xorinstruction" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="optimizer.pass_support.ModulePass">
+<em class="property">class </em><code class="descclassname">optimizer.pass_support.</code><code class="descname">ModulePass</code><a class="reference internal" href="_modules/optimizer/pass_support.html#ModulePass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.ModulePass" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="optimizer.pass_support.ModulePass.run_on_module">
+<code class="descname">run_on_module</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/optimizer/pass_support.html#ModulePass.run_on_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.pass_support.ModulePass.run_on_module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-optimizer.passmanager">
+<span id="optimizer-passmanager-module"></span><h2>optimizer.passmanager module<a class="headerlink" href="#module-optimizer.passmanager" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="optimizer.passmanager.PassManager">
+<em class="property">class </em><code class="descclassname">optimizer.passmanager.</code><code class="descname">PassManager</code><a class="reference internal" href="_modules/optimizer/passmanager.html#PassManager"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#optimizer.passmanager.PassManager" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="optimizer.passmanager.PassManager.add_function_pass">
+<code class="descname">add_function_pass</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.passmanager.PassManager.add_function_pass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.passmanager.PassManager.add_module_pass">
+<code class="descname">add_module_pass</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.passmanager.PassManager.add_module_pass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="optimizer.passmanager.PassManager.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#optimizer.passmanager.PassManager.run" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-optimizer">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-optimizer" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">optimizer package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-optimizer.basicpass">optimizer.basicpass module</a></li>
+<li><a class="reference internal" href="#module-optimizer.pass_support">optimizer.pass_support module</a></li>
+<li><a class="reference internal" href="#module-optimizer.passmanager">optimizer.passmanager module</a></li>
+<li><a class="reference internal" href="#module-optimizer">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="main.html"
+                        title="previous chapter">main module</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyjit.html"
+                        title="next chapter">pyjit package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/optimizer.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/optimizer.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,657 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyjit package &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="index.html" />
+    <link rel="next" title="utils package" href="utils.html" />
+    <link rel="prev" title="optimizer package" href="optimizer.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="utils.html" title="utils package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="optimizer.html" title="optimizer package"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">src  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="pyjit-package">
+<h1>pyjit package<a class="headerlink" href="#pyjit-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-pyjit.codegen">
+<span id="pyjit-codegen-module"></span><h2>pyjit.codegen module<a class="headerlink" href="#module-pyjit.codegen" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyjit.codegen.IREmitter">
+<em class="property">class </em><code class="descclassname">pyjit.codegen.</code><code class="descname">IREmitter</code><span class="sig-paren">(</span><em>mod_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/codegen.html#IREmitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.codegen.IREmitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="utils.html#utils.base_visitor.BaseVisitor" title="utils.base_visitor.BaseVisitor"><code class="xref py py-class docutils literal"><span class="pre">utils.base_visitor.BaseVisitor</span></code></a></p>
+<dl class="attribute">
+<dt id="pyjit.codegen.IREmitter.irbuilder">
+<code class="descname">irbuilder</code><a class="headerlink" href="#pyjit.codegen.IREmitter.irbuilder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="pyjit.codegen.IREmitter.module">
+<code class="descname">module</code><a class="headerlink" href="#pyjit.codegen.IREmitter.module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.codegen.IREmitter.visit_func">
+<code class="descname">visit_func</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/codegen.html#IREmitter.visit_func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.codegen.IREmitter.visit_func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyjit.decorators">
+<span id="pyjit-decorators-module"></span><h2>pyjit.decorators module<a class="headerlink" href="#module-pyjit.decorators" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyjit.decorators.arg_pytype">
+<code class="descclassname">pyjit.decorators.</code><code class="descname">arg_pytype</code><span class="sig-paren">(</span><em>arg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/decorators.html#arg_pytype"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.decorators.arg_pytype" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.decorators.autojit">
+<code class="descclassname">pyjit.decorators.</code><code class="descname">autojit</code><span class="sig-paren">(</span><em>fn</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/decorators.html#autojit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.decorators.autojit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.decorators.codegen">
+<code class="descclassname">pyjit.decorators.</code><code class="descname">codegen</code><span class="sig-paren">(</span><em>ast</em>, <em>specializer</em>, <em>retty</em>, <em>argtys</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/decorators.html#codegen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.decorators.codegen" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.decorators.specialize">
+<code class="descclassname">pyjit.decorators.</code><code class="descname">specialize</code><span class="sig-paren">(</span><em>ast</em>, <em>infer_ty</em>, <em>mgu</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/decorators.html#specialize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.decorators.specialize" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.decorators.typeinfer">
+<code class="descclassname">pyjit.decorators.</code><code class="descname">typeinfer</code><span class="sig-paren">(</span><em>ast</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/decorators.html#typeinfer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.decorators.typeinfer" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pyjit.nodes">
+<span id="pyjit-nodes-module"></span><h2>pyjit.nodes module<a class="headerlink" href="#module-pyjit.nodes" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyjit.nodes.App">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">App</code><span class="sig-paren">(</span><em>fn</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#App"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.App" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.AppTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">AppTy</code><span class="sig-paren">(</span><em>a</em>, <em>b</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#AppTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.AppTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Assign">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Assign</code><span class="sig-paren">(</span><em>ref</em>, <em>val</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Assign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Assign" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.BoolTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">BoolTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#BoolTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.BoolTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Compare">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Compare</code><a class="reference internal" href="_modules/pyjit/nodes.html#Compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Compare" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.CompareOps">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">CompareOps</code><a class="reference internal" href="_modules/pyjit/nodes.html#CompareOps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.CompareOps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="attribute">
+<dt id="pyjit.nodes.CompareOps.LT">
+<code class="descname">LT</code><em class="property"> = 0</em><a class="headerlink" href="#pyjit.nodes.CompareOps.LT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.ConstructorTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">ConstructorTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#ConstructorTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.ConstructorTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.DictTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">DictTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#DictTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.DictTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.FloatTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">FloatTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#FloatTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.FloatTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Func">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Func</code><span class="sig-paren">(</span><em>fname</em>, <em>args</em>, <em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Func" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.FuncTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">FuncTy</code><span class="sig-paren">(</span><em>argsTys</em>, <em>retTy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#FuncTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.FuncTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.If">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">If</code><span class="sig-paren">(</span><em>var</em>, <em>begin</em>, <em>end</em>, <em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#If"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.If" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Index">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Index</code><span class="sig-paren">(</span><em>val</em>, <em>ix</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.IntTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">IntTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#IntTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.IntTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.ListTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">ListTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#ListTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.ListTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.LitBool">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">LitBool</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#LitBool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.LitBool" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.LitFloat">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">LitFloat</code><span class="sig-paren">(</span><em>s</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#LitFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.LitFloat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.LitInt">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">LitInt</code><span class="sig-paren">(</span><em>s</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#LitInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.LitInt" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.LitString">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">LitString</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#LitString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.LitString" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Loop">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Loop</code><span class="sig-paren">(</span><em>var</em>, <em>begin</em>, <em>end</em>, <em>body</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Loop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Noop">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Noop</code><a class="reference internal" href="_modules/pyjit/nodes.html#Noop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Noop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Prim">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Prim</code><span class="sig-paren">(</span><em>fn</em>, <em>args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Prim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Prim" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Return">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Return</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Return"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Return" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.StringTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">StringTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#StringTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.StringTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.TupleTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">TupleTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#TupleTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.TupleTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.Var">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">Var</code><span class="sig-paren">(</span><em>id</em>, <em>type=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#Var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.Var" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">_ast.AST</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.nodes.VarTy">
+<em class="property">class </em><code class="descclassname">pyjit.nodes.</code><code class="descname">VarTy</code><span class="sig-paren">(</span><em>s</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#VarTy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.VarTy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjit.nodes.array">
+<code class="descclassname">pyjit.nodes.</code><code class="descname">array</code><span class="sig-paren">(</span><em>t</em><span class="sig-paren">)</span><a class="headerlink" href="#pyjit.nodes.array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.nodes.ftv">
+<code class="descclassname">pyjit.nodes.</code><code class="descname">ftv</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#ftv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.ftv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.nodes.is_array">
+<code class="descclassname">pyjit.nodes.</code><code class="descname">is_array</code><span class="sig-paren">(</span><em>ty</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/nodes.html#is_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.nodes.is_array" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pyjit.pretty_print">
+<span id="pyjit-pretty-print-module"></span><h2>pyjit.pretty_print module<a class="headerlink" href="#module-pyjit.pretty_print" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyjit.pretty_print.ast2tree">
+<code class="descclassname">pyjit.pretty_print.</code><code class="descname">ast2tree</code><span class="sig-paren">(</span><em>node</em>, <em>include_attrs=True</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/pretty_print.html#ast2tree"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.pretty_print.ast2tree" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.pretty_print.pformat_ast">
+<code class="descclassname">pyjit.pretty_print.</code><code class="descname">pformat_ast</code><span class="sig-paren">(</span><em>node</em>, <em>include_attrs=False</em>, <em>**kws</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/pretty_print.html#pformat_ast"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.pretty_print.pformat_ast" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pyjit.type_infer">
+<span id="pyjit-type-infer-module"></span><h2>pyjit.type_infer module<a class="headerlink" href="#module-pyjit.type_infer" title="Permalink to this headline">¶</a></h2>
+<dl class="exception">
+<dt id="pyjit.type_infer.InferError">
+<em class="property">exception </em><code class="descclassname">pyjit.type_infer.</code><code class="descname">InferError</code><span class="sig-paren">(</span><em>ty1</em>, <em>ty2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.type_infer.InferType">
+<em class="property">class </em><code class="descclassname">pyjit.type_infer.</code><code class="descname">InferType</code><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="utils.html#utils.base_visitor.BaseVisitor" title="utils.base_visitor.BaseVisitor"><code class="xref py py-class docutils literal"><span class="pre">utils.base_visitor.BaseVisitor</span></code></a></p>
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.fresh">
+<code class="descname">fresh</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.fresh"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.fresh" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.generic_visit">
+<code class="descname">generic_visit</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.generic_visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.generic_visit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit">
+<code class="descname">visit</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Assign">
+<code class="descname">visit_Assign</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Assign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Assign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Func">
+<code class="descname">visit_Func</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Func"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Func" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Index">
+<code class="descname">visit_Index</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Index" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_LitBool">
+<code class="descname">visit_LitBool</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_LitBool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_LitBool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_LitFloat">
+<code class="descname">visit_LitFloat</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_LitFloat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_LitFloat" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_LitInt">
+<code class="descname">visit_LitInt</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_LitInt"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_LitInt" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_LitString">
+<code class="descname">visit_LitString</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_LitString"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_LitString" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Loop">
+<code class="descname">visit_Loop</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Loop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Loop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Noop">
+<code class="descname">visit_Noop</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Noop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Noop" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Prim">
+<code class="descname">visit_Prim</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Prim"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Prim" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Return">
+<code class="descname">visit_Return</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Return"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Return" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.type_infer.InferType.visit_Var">
+<code class="descname">visit_Var</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#InferType.visit_Var"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.InferType.visit_Var" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjit.type_infer.TypeSolver">
+<em class="property">class </em><code class="descclassname">pyjit.type_infer.</code><code class="descname">TypeSolver</code><a class="reference internal" href="_modules/pyjit/type_infer.html#TypeSolver"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.TypeSolver" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="staticmethod">
+<dt id="pyjit.type_infer.TypeSolver.solve">
+<em class="property">static </em><code class="descname">solve</code><span class="sig-paren">(</span><em>type_constraints</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#TypeSolver.solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.TypeSolver.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="exception">
+<dt id="pyjit.type_infer.UnderDeteremined">
+<em class="property">exception </em><code class="descclassname">pyjit.type_infer.</code><code class="descname">UnderDeteremined</code><a class="reference internal" href="_modules/pyjit/type_infer.html#UnderDeteremined"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.UnderDeteremined" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.apply">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">apply</code><span class="sig-paren">(</span><em>s</em>, <em>t</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#apply"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.apply" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.applyList">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">applyList</code><span class="sig-paren">(</span><em>s</em>, <em>xs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#applyList"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.applyList" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.bind">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">bind</code><span class="sig-paren">(</span><em>n</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#bind"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.bind" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.compose">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">compose</code><span class="sig-paren">(</span><em>s1</em>, <em>s2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#compose"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.compose" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.empty">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">empty</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#empty"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.empty" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.naming">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">naming</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#naming"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.naming" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.occurs_check">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">occurs_check</code><span class="sig-paren">(</span><em>n</em>, <em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#occurs_check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.occurs_check" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.solve">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">solve</code><span class="sig-paren">(</span><em>xs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#solve"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.solve" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.unify">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">unify</code><span class="sig-paren">(</span><em>x</em>, <em>y</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#unify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.unify" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjit.type_infer.union">
+<code class="descclassname">pyjit.type_infer.</code><code class="descname">union</code><span class="sig-paren">(</span><em>s1</em>, <em>s2</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/type_infer.html#union"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.type_infer.union" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-pyjit.visitors">
+<span id="pyjit-visitors-module"></span><h2>pyjit.visitors module<a class="headerlink" href="#module-pyjit.visitors" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="pyjit.visitors.PythonVisitor">
+<em class="property">class </em><code class="descclassname">pyjit.visitors.</code><code class="descname">PythonVisitor</code><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">ast.NodeVisitor</span></code></p>
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.generic_visit">
+<code class="descname">generic_visit</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.generic_visit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.generic_visit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Assign">
+<code class="descname">visit_Assign</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Assign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Assign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Attribute">
+<code class="descname">visit_Attribute</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Attribute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Attribute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_AugAssign">
+<code class="descname">visit_AugAssign</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_AugAssign"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_AugAssign" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_BinOp">
+<code class="descname">visit_BinOp</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_BinOp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_BinOp" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Bool">
+<code class="descname">visit_Bool</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Bool"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Bool" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Call">
+<code class="descname">visit_Call</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Call"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Call" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Compare">
+<code class="descname">visit_Compare</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Compare"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Compare" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_For">
+<code class="descname">visit_For</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_For"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_For" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_FunctionDef">
+<code class="descname">visit_FunctionDef</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_FunctionDef"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_FunctionDef" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_If">
+<code class="descname">visit_If</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_If"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_If" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Lambda">
+<code class="descname">visit_Lambda</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Lambda"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Lambda" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_List">
+<code class="descname">visit_List</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_List"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_List" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Module">
+<code class="descname">visit_Module</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Module" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Name">
+<code class="descname">visit_Name</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Name"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Num">
+<code class="descname">visit_Num</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Num"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Num" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Pass">
+<code class="descname">visit_Pass</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Pass"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Pass" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Return">
+<code class="descname">visit_Return</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Return"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Return" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Str">
+<code class="descname">visit_Str</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Str"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Str" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_Subscript">
+<code class="descname">visit_Subscript</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_Subscript"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_Subscript" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="pyjit.visitors.PythonVisitor.visit_arg">
+<code class="descname">visit_arg</code><span class="sig-paren">(</span><em>node</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/pyjit/visitors.html#PythonVisitor.visit_arg"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjit.visitors.PythonVisitor.visit_arg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-pyjit">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyjit" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyjit package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-pyjit.codegen">pyjit.codegen module</a></li>
+<li><a class="reference internal" href="#module-pyjit.decorators">pyjit.decorators module</a></li>
+<li><a class="reference internal" href="#module-pyjit.nodes">pyjit.nodes module</a></li>
+<li><a class="reference internal" href="#module-pyjit.pretty_print">pyjit.pretty_print module</a></li>
+<li><a class="reference internal" href="#module-pyjit.type_infer">pyjit.type_infer module</a></li>
+<li><a class="reference internal" href="#module-pyjit.visitors">pyjit.visitors module</a></li>
+<li><a class="reference internal" href="#module-pyjit">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="optimizer.html"
+                        title="previous chapter">optimizer package</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="utils.html"
+                        title="next chapter">utils package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/pyjit.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/pyjit.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>

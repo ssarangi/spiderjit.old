@@ -1,0 +1,235 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>optimizer.pass_support &mdash; src  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="top" title="src  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">src  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for optimizer.pass_support</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;sarangis&#39;</span>
+
+<div class="viewcode-block" id="ModulePass"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.ModulePass">[docs]</a><span class="k">class</span> <span class="nc">ModulePass</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="ModulePass.run_on_module"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.ModulePass.run_on_module">[docs]</a>    <span class="k">def</span> <span class="nf">run_on_module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Derived passes class should implement run_on_module&quot;</span><span class="p">)</span>
+</div></div>
+<div class="viewcode-block" id="FunctionPass"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.FunctionPass">[docs]</a><span class="k">class</span> <span class="nc">FunctionPass</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="FunctionPass.run_on_function"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.FunctionPass.run_on_function">[docs]</a>    <span class="k">def</span> <span class="nf">run_on_function</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Derived passes class should implement run_on_function&quot;</span><span class="p">)</span>
+
+</div></div>
+<div class="viewcode-block" id="InstVisitorPass"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass">[docs]</a><span class="k">class</span> <span class="nc">InstVisitorPass</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="InstVisitorPass.visit"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit">[docs]</a>    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.generic_visit"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.generic_visit">[docs]</a>    <span class="k">def</span> <span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Generic Visitor not implemented&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_module"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_module">[docs]</a>    <span class="k">def</span> <span class="nf">visit_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c"># Iterate through all the functions in the module</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">visit_function</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">functions</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">results</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_function"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_function">[docs]</a>    <span class="k">def</span> <span class="nf">visit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c"># Iterate through all the basic blocks in the module</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">visit_basicblock</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span> <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">basic_blocks</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">results</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_basicblock"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_basicblock">[docs]</a>    <span class="k">def</span> <span class="nf">visit_basicblock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c"># Iterate through all the instructions in the module</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">instructions</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">results</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_callinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_callinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_callinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_terminateinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_terminateinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_terminateinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_returninstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_returninstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_returninstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+    <span class="k">def</span> <span class="nf">visit_selectinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+<div class="viewcode-block" id="InstVisitorPass.visit_loadinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_loadinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_loadinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_storeinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_storeinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_storeinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_addinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_addinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_addinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_subinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_subinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_subinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_mulinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_mulinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_mulinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_divinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_divinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_divinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_faddinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_faddinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_faddinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_fsubinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_fsubinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fsubinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_fmulinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_fmulinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fmulinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_fdivinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_fdivinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fdivinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_allocainstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_allocainstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_allocainstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_phiinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_phiinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_phiinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_branchinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_branchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_branchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_conditionalbranchinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_conditionalbranchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_conditionalbranchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_indirectbranchinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_indirectbranchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_indirectbranchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_switchinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_switchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_switchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_selectinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_selectinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_selectinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_icmpinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_icmpinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_icmpinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_fcmpinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_fcmpinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fcmpinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_castinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_castinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_castinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_gepinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_gepinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_gepinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_extractelementinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_extractelementinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_extractelementinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_insertelementinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_insertelementinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_insertelementinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_shiftleftinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_shiftleftinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_shiftleftinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_logicalshiftrightinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_logicalshiftrightinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_logicalshiftrightinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_arithmeticshiftrightinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_arithmeticshiftrightinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_arithmeticshiftrightinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_andinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_andinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_andinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_orinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_orinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_orinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span>
+</div>
+<div class="viewcode-block" id="InstVisitorPass.visit_xorinstruction"><a class="viewcode-back" href="../../optimizer.html#optimizer.pass_support.InstVisitorPass.visit_xorinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_xorinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">pass</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>
