@@ -9,6 +9,7 @@ from optimizer.basicpass import *
 from pyjit.pretty_print import *
 from pyjit.decorators import *
 from vm.vm import *
+from tests.fib import *
 
 int32Ty = IntType(32)
 floatTy = FloatType()
@@ -61,15 +62,6 @@ def generate_ir():
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
 
-    vm = x86VirtualMachine()
-    vm.visit(mod)
-
-from codegen.pyasm2 import *
-def x86_emulate():
-    inst = mov(eax, 5)
-    print(inst)
-
-
 # @autojit
 # def addup(n):
 #     x = 1
@@ -101,6 +93,17 @@ def x86_emulate():
 #     else:
 #         var = 'hi'
 
+def test_bytecode_vm():
+    dis.dis(fib.__code__)
+    for n in range(10):
+        vm = BytecodeVM(fib, n)
+        vm.execute()
+        print("fib(", n, ") =", fib(n), " = ", vm.value)
+
+    #vm = BytecodeVM(fib, 3)
+    #vm.execute()
+    #print(vm.value)
+
 if __name__ == "__main__":
     # generate_ir()
-    x86_emulate()
+    test_bytecode_vm()
