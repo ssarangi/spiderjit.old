@@ -76,6 +76,8 @@ def generate_ir():
     passmgr.add_function_pass(PrintBasicBlocksPass())
     passmgr.run(mod)
 
+    print("-" * 50)
+    print("Running IR Virtual machine")
     irvm = IRVirtualMachine()
     irvm.visit(mod)
     print(irvm.eval_result)
