@@ -79,7 +79,7 @@ class BytecodeVM:
         while True:
             op = self.__program[self.__ip]
             self.__ip += 1
-            opmethod = "visit_%s" % dis.opname[op]
+            opmethod = "execute_%s" % dis.opname[op]
 
             if op >= dis.HAVE_ARGUMENT:
                 low = self.__program[self.__ip]
@@ -94,37 +94,37 @@ class BytecodeVM:
             else:
                 raise NotImplementedError("Method %s not found." % (opmethod))
 
-    def visit_NOP(self, oparg):
+    def execute_NOP(self, oparg):
         """
         Do nothing code. Used as a placeholder by the bytecode optimizer.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_POP_TOP(self, oparg):
+    def execute_POP_TOP(self, oparg):
         """
         Removes the top-of-stack (TOS) item.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_ROT_TWO(self, oparg):
+    def execute_ROT_TWO(self, oparg):
         """
         Swaps the two top-most stack items.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_ROT_THREE(self, oparg):
+    def execute_ROT_THREE(self, oparg):
         """
         Lifts second and third stack item one position up, moves top down to position three.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_DUP_TOP(self, oparg):
+    def execute_DUP_TOP(self, oparg):
         """
         Duplicates the reference on top of the stack.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_DUP_TOP_TWO(self, oparg):
+    def execute_DUP_TOP_TWO(self, oparg):
         """
         Duplicates the two references on top of the stack, leaving them in the same order.
         """
@@ -133,31 +133,31 @@ class BytecodeVM:
     # Unary operations
     # Unary operations take the top of the stack, apply the operation, and push the result back on the stack.
 
-    def visit_UNARY_POSITIVE(self, oparg):
+    def execute_UNARY_POSITIVE(self, oparg):
         """
         Implements TOS = +TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_UNARY_NEGATIVE(self, oparg):
+    def execute_UNARY_NEGATIVE(self, oparg):
         """
         Implements TOS = -TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_UNARY_NOT(self, oparg):
+    def execute_UNARY_NOT(self, oparg):
         """
         Implements TOS = not TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_UNARY_INVERT(self, oparg):
+    def execute_UNARY_INVERT(self, oparg):
         """
         Implements TOS = ~TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_GET_ITER(self, oparg):
+    def execute_GET_ITER(self, oparg):
         """
         Implements TOS = iter(TOS).
         """
@@ -167,41 +167,41 @@ class BytecodeVM:
     # Binary operations remove the top of the stack (TOS) and the second top-most stack item (TOS1) from the stack.
     # They perform the operation, and put the result back on the stack.
 
-    def visit_BINARY_POWER(self, oparg):
+    def execute_BINARY_POWER(self, oparg):
         """
         Implements TOS = TOS1 ** TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_BINARY_MULTIPLY(self, oparg):
+    def execute_BINARY_MULTIPLY(self, oparg):
         """
         Implements TOS = TOS1 * TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_FLOOR_DIVIDE(self, oparg):
+    def execute_BINARY_FLOOR_DIVIDE(self, oparg):
         """
         Implements TOS = TOS1 // TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_TRUE_DIVIDE(self, oparg):
+    def execute_BINARY_TRUE_DIVIDE(self, oparg):
         """
         Implements TOS = TOS1 / TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_MODULO(self, oparg):
+    def execute_BINARY_MODULO(self, oparg):
         """
         Implements TOS = TOS1 % TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_ADD(self, oparg):
+    def execute_BINARY_ADD(self, oparg):
         """
         Implements TOS = TOS1 + TOS.
         """
@@ -210,7 +210,7 @@ class BytecodeVM:
         self.__stack.append(v + w)
 
 
-    def visit_BINARY_SUBTRACT(self, oparg):
+    def execute_BINARY_SUBTRACT(self, oparg):
         """
         Implements TOS = TOS1 - TOS.
         """
@@ -218,42 +218,42 @@ class BytecodeVM:
         v = self.__stack.pop()
         self.__stack.append(v - w)
 
-    def visit_BINARY_SUBSCR(self, oparg):
+    def execute_BINARY_SUBSCR(self, oparg):
         """
         Implements TOS = TOS1[TOS].
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_LSHIFT(self, oparg):
+    def execute_BINARY_LSHIFT(self, oparg):
         """
         Implements TOS = TOS1 << TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_RSHIFT(self, oparg):
+    def execute_BINARY_RSHIFT(self, oparg):
         """
         Implements TOS = TOS1 >> TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_AND(self, oparg):
+    def execute_BINARY_AND(self, oparg):
         """
         Implements TOS = TOS1 & TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_XOR(self, oparg):
+    def execute_BINARY_XOR(self, oparg):
         """
         Implements TOS = TOS1 ^ TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BINARY_OR(self, oparg):
+    def execute_BINARY_OR(self, oparg):
         """
         Implements TOS = TOS1 | TOS.
         """
@@ -265,98 +265,98 @@ class BytecodeVM:
     # the result back on the stack, but the operation is done in-place when TOS1 supports it, and
     # the resulting TOS may be (but does not have to be) the original TOS1.
 
-    def visit_INPLACE_POWER(self, oparg):
+    def execute_INPLACE_POWER(self, oparg):
         """
         Implements in-place TOS = TOS1 ** TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_MULTIPLY(self, oparg):
+    def execute_INPLACE_MULTIPLY(self, oparg):
         """
         Implements in-place TOS = TOS1 * TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_FLOOR_DIVIDE(self, oparg):
+    def execute_INPLACE_FLOOR_DIVIDE(self, oparg):
         """
         Implements in-place TOS = TOS1 // TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_TRUE_DIVIDE(self, oparg):
+    def execute_INPLACE_TRUE_DIVIDE(self, oparg):
         """
         Implements in-place TOS = TOS1 / TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_MODULO(self, oparg):
+    def execute_INPLACE_MODULO(self, oparg):
         """
         Implements in-place TOS = TOS1 % TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_ADD(self, oparg):
+    def execute_INPLACE_ADD(self, oparg):
         """
         Implements in-place TOS = TOS1 + TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_SUBTRACT(self, oparg):
+    def execute_INPLACE_SUBTRACT(self, oparg):
         """
         Implements in-place TOS = TOS1 - TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_LSHIFT(self, oparg):
+    def execute_INPLACE_LSHIFT(self, oparg):
         """
         Implements in-place TOS = TOS1 << TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_RSHIFT(self, oparg):
+    def execute_INPLACE_RSHIFT(self, oparg):
         """
         Implements in-place TOS = TOS1 >> TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_AND(self, oparg):
+    def execute_INPLACE_AND(self, oparg):
         """
         Implements in-place TOS = TOS1 & TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_XOR(self, oparg):
+    def execute_INPLACE_XOR(self, oparg):
         """
         Implements in-place TOS = TOS1 ^ TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_INPLACE_OR(self, oparg):
+    def execute_INPLACE_OR(self, oparg):
         """
         Implements in-place TOS = TOS1 | TOS.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_STORE_SUBSCR(self, oparg):
+    def execute_STORE_SUBSCR(self, oparg):
         """
         Implements TOS1[TOS] = TOS2.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_SUBSCR(self, oparg):
+    def execute_DELETE_SUBSCR(self, oparg):
         """
         Implements del TOS1[TOS].
         """
@@ -365,7 +365,7 @@ class BytecodeVM:
 
     # Miscellaneous opcodes
 
-    def visit_PRINT_EXPR(self, oparg):
+    def execute_PRINT_EXPR(self, oparg):
         """
         Implements the expression statement for the interactive mode. TOS is removed from the
         stack and printed. In non-interactive mode, an expression statement is terminated with POP_TOP.
@@ -373,14 +373,14 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BREAK_LOOP(self, oparg):
+    def execute_BREAK_LOOP(self, oparg):
         """
         Terminates a loop due to a break statement.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_CONTINUE_LOOP(self, target):
+    def execute_CONTINUE_LOOP(self, target):
         """
         Continues a loop due to a continue statement. target is the address to jump to (which should be
         a FOR_ITER instruction).
@@ -388,21 +388,21 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_SET_ADD(self, i):
+    def execute_SET_ADD(self, i):
         """
         Calls set.add(TOS1[-i], TOS). Used to implement set comprehensions.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LIST_APPEND(self, i):
+    def execute_LIST_APPEND(self, i):
         """
         Calls list.append(TOS[-i], TOS). Used to implement list comprehensions.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_MAP_ADD(self, i):
+    def execute_MAP_ADD(self, i):
         """
         Calls dict.setitem(TOS1[-i], TOS, TOS1). Used to implement dict comprehensions.
         """
@@ -412,7 +412,7 @@ class BytecodeVM:
     # For all of the SET_ADD, LIST_APPEND and MAP_ADD instructions, while the added value or key/value pair
     # is popped off, the container object remains on the stack so that it is available for further iterations of the loop.
 
-    def visit_RETURN_VALUE(self, oparg):
+    def execute_RETURN_VALUE(self, oparg):
         """
         Returns with TOS to the caller of the function.
         """
@@ -421,14 +421,14 @@ class BytecodeVM:
         terminate = True
         return terminate
 
-    def visit_YIELD_VALUE(self):
+    def execute_YIELD_VALUE(self):
         """
         Pops TOS and yields it from a generator.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_YIELD_FROM(self):
+    def execute_YIELD_FROM(self):
         """
         Pops TOS and delegates to it as a subiterator from a generator.
         """
@@ -437,7 +437,7 @@ class BytecodeVM:
 
     # New in version 3.3.
 
-    def visit_IMPORT_STAR(self):
+    def execute_IMPORT_STAR(self):
         """
         Loads all symbols not starting with '_' directly from the module TOS to the local namespace.
         The module is popped after loading all names. This opcode implements from module import *.
@@ -445,7 +445,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_POP_BLOCK(self):
+    def execute_POP_BLOCK(self):
         """
         Removes one block from the block stack. Per frame, there is a stack of blocks, denoting nested loops,
         try statements, and such.
@@ -453,7 +453,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_POP_EXCEPT(self):
+    def execute_POP_EXCEPT(self):
         """
         Removes one block from the block stack. The popped block must be an exception handler block, as implicitly
         created when entering an except handler. In addition to popping extraneous values from the frame stack,
@@ -462,7 +462,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_END_FINALLY(self):
+    def execute_END_FINALLY(self):
         """
         Terminates a finally clause. The interpreter recalls whether the exception has to be re-raised, or whether
         the function returns, and continues with the outer-next block.
@@ -470,14 +470,14 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_BUILD_CLASS(self):
+    def execute_LOAD_BUILD_CLASS(self):
         """
         Pushes builtins.__build_class__() onto the stack. It is later called by CALL_FUNCTION to construct a class.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_SETUP_WITH(self, delta):
+    def execute_SETUP_WITH(self, delta):
         """
         This opcode performs several operations before a with block starts. First, it loads __exit__() from the 
         context manager and pushes it onto the stack for later use by WITH_CLEANUP. Then, __enter__() is called, and
@@ -487,7 +487,7 @@ class BytecodeVM:
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_WITH_CLEANUP(self):
+    def execute_WITH_CLEANUP(self):
         """
         Cleans up the stack when a with statement block exits. TOS is the context manager’s __exit__() bound method.
         Below TOS are 1–3 values indicating how/why the finally clause was entered:
@@ -506,7 +506,7 @@ class BytecodeVM:
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_STORE_NAME(self, namei):
+    def execute_STORE_NAME(self, namei):
         """
         Implements name = TOS. namei is the index of name in the attribute co_names of the code object. The compiler tries
         to use STORE_FAST or STORE_GLOBAL if possible.
@@ -514,21 +514,21 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_NAME(self, namei):
+    def execute_DELETE_NAME(self, namei):
         """
         Implements del name, where namei is the index into co_names attribute of the code object.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_UNPACK_SEQUENCE(self, count):
+    def execute_UNPACK_SEQUENCE(self, count):
         """
         Unpacks TOS into count individual values, which are put onto the stack right-to-left.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_UNPACK_EX(self, counts):
+    def execute_UNPACK_EX(self, counts):
         """
         Implements assignment with a starred target: Unpacks an iterable in TOS into individual values, where the total number
         of values can be smaller than the number of items in the iterable: one the new values will be a list of all leftover items.
@@ -538,84 +538,84 @@ class BytecodeVM:
 
     # The low byte of counts is the number of values before the list value, the high byte of counts the number of values after it. The resulting values are put onto the stack right-to-left.
 
-    def visit_STORE_ATTR(self, namei):
+    def execute_STORE_ATTR(self, namei):
         """
         Implements TOS.name = TOS1, where namei is the index of name in co_names.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_ATTR(self, namei):
+    def execute_DELETE_ATTR(self, namei):
         """
         Implements del TOS.name, using namei as index into co_names.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_STORE_GLOBAL(self, namei):
+    def execute_STORE_GLOBAL(self, namei):
         """
         Works as STORE_NAME, but stores the name as a global.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_GLOBAL(self, namei):
+    def execute_DELETE_GLOBAL(self, namei):
         """
         Works as DELETE_NAME, but deletes a global name.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_CONST(self, consti):
+    def execute_LOAD_CONST(self, consti):
         """
         Pushes co_consts[consti] onto the stack.
         """
         self.__stack.append(self.__constants[consti])
 
 
-    def visit_LOAD_NAME(self, namei):
+    def execute_LOAD_NAME(self, namei):
         """
         Pushes the value associated with co_names[namei] onto the stack.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BUILD_TUPLE(self, count):
+    def execute_BUILD_TUPLE(self, count):
         """
         Creates a tuple consuming count items from the stack, and pushes the resulting tuple onto the stack.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BUILD_LIST(self, count):
+    def execute_BUILD_LIST(self, count):
         """
         Works as BUILD_TUPLE, but creates a list.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BUILD_SET(self, count):
+    def execute_BUILD_SET(self, count):
         """
         Works as BUILD_TUPLE, but creates a set.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_BUILD_MAP(self, count):
+    def execute_BUILD_MAP(self, count):
         """
         Pushes a new dictionary object onto the stack. The dictionary is pre-sized to hold count entries.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_ATTR(self, namei):
+    def execute_LOAD_ATTR(self, namei):
         """
         Replaces TOS with getattr(TOS, co_names[namei]).
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_COMPARE_OP(self, compare_op):
+    def execute_COMPARE_OP(self, compare_op):
         """
         Performs a Boolean operation. The operation name can be found in cmp_op[opname].
         """
@@ -627,7 +627,7 @@ class BytecodeVM:
         value = COMPARE_OPERATORS[compare_op](v, w)
         self.__stack.append(value)
 
-    def visit_IMPORT_NAME(self, namei):
+    def execute_IMPORT_NAME(self, namei):
         """
         Imports the module co_names[namei]. TOS and TOS1 are popped and provide the fromlist and level arguments of __import__().
         The module object is pushed onto the stack. The current namespace is not affected: for a proper import statement, a subsequent
@@ -635,7 +635,7 @@ class BytecodeVM:
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_IMPORT_FROM(self, namei):
+    def execute_IMPORT_FROM(self, namei):
         """
         Loads the attribute co_names[namei] from the module found in TOS. The resulting object is pushed onto the stack,
         to be subsequently stored by a STORE_FAST instruction.
@@ -643,49 +643,49 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_JUMP_FORWARD(self, delta):
+    def execute_JUMP_FORWARD(self, delta):
         """
         Increments bytecode counter by delta.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_POP_JUMP_IF_TRUE(self, target):
+    def execute_POP_JUMP_IF_TRUE(self, target):
         """
         If TOS is true, sets the bytecode counter to target. TOS is popped.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_POP_JUMP_IF_FALSE(self, target):
+    def execute_POP_JUMP_IF_FALSE(self, target):
         """
         If TOS is false, sets the bytecode counter to target. TOS is popped.
         """
         if not self.__stack.pop():
             self.__ip = target
 
-    def visit_JUMP_IF_TRUE_OR_POP(self, target):
+    def execute_JUMP_IF_TRUE_OR_POP(self, target):
         """
         If TOS is true, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is false), TOS is popped.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_JUMP_IF_FALSE_OR_POP(self, target):
+    def execute_JUMP_IF_FALSE_OR_POP(self, target):
         """
         If TOS is false, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is true), TOS is popped.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_JUMP_ABSOLUTE(self, target):
+    def execute_JUMP_ABSOLUTE(self, target):
         """
         Set bytecode counter to target.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_FOR_ITER(self, delta):
+    def execute_FOR_ITER(self, delta):
         """
         TOS is an iterator. Call its __next__() method. If this yields a new value, push it on the stack (leaving the iterator below it).
         If the iterator indicates it is exhausted TOS is popped, and the byte code counter is incremented by delta.
@@ -693,7 +693,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_GLOBAL(self, namei):
+    def execute_LOAD_GLOBAL(self, namei):
         """
         Loads the global named co_names[namei] onto the stack.
         """
@@ -703,56 +703,56 @@ class BytecodeVM:
         else:
             self.__stack.append(self.__builtins_dict[name])
 
-    def visit_SETUP_LOOP(self, delta):
+    def execute_SETUP_LOOP(self, delta):
         """
         Pushes a block for a loop onto the block stack. The block spans from the current instruction with a size of delta bytes.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_SETUP_EXCEPT(self, delta):
+    def execute_SETUP_EXCEPT(self, delta):
         """
         Pushes a try block from a try-except clause onto the block stack. delta points to the first except block.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_SETUP_FINALLY(self, delta):
+    def execute_SETUP_FINALLY(self, delta):
         """
         Pushes a try block from a try-except clause onto the block stack. delta points to the finally block.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_STORE_MAP(self):
+    def execute_STORE_MAP(self):
         """
         Store a key and value pair in a dictionary. Pops the key and value while leaving the dictionary on the stack.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_FAST(self, var_num):
+    def execute_LOAD_FAST(self, var_num):
         """
         Pushes a reference to the local co_varnames[var_num] onto the stack.
         """
         self.__stack.append(self.__locals[var_num])
 
 
-    def visit_STORE_FAST(self, var_num):
+    def execute_STORE_FAST(self, var_num):
         """
         Stores TOS into the local co_varnames[var_num].
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_FAST(self, var_num):
+    def execute_DELETE_FAST(self, var_num):
         """
         Deletes local co_varnames[var_num].
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_CLOSURE(self, i):
+    def execute_LOAD_CLOSURE(self, i):
         """
         Pushes a reference to the cell contained in slot i of the cell and free variable storage. The name of the variable is
         co_cellvars[i] if i is less than the length of co_cellvars. Otherwise it is co_freevars[i - len(co_cellvars)].
@@ -760,7 +760,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_DEREF(self, i):
+    def execute_LOAD_DEREF(self, i):
         """
         Loads the cell contained in slot i of the cell and free variable storage. Pushes a reference to the object the cell
         contains on the stack.
@@ -768,7 +768,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_LOAD_CLASSDEREF(self, i):
+    def execute_LOAD_CLASSDEREF(self, i):
         """
         Much like LOAD_DEREF but first checks the locals dictionary before consulting the cell. This is used for loading free
         variables in class bodies.
@@ -776,21 +776,21 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_STORE_DEREF(self, i):
+    def execute_STORE_DEREF(self, i):
         """
         Stores TOS into the cell contained in slot i of the cell and free variable storage.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_DELETE_DEREF(self, i):
+    def execute_DELETE_DEREF(self, i):
         """
         Empties the cell contained in slot i of the cell and free variable storage. Used by the del statement.
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_RAISE_VARARGS(self, argc):
+    def execute_RAISE_VARARGS(self, argc):
         """
         Raises an exception. argc indicates the number of parameters to the raise statement, ranging from 0 to 3. The handler will
         find the traceback as TOS2, the parameter as TOS1, and the exception as TOS.
@@ -798,7 +798,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_CALL_FUNCTION(self, argc):
+    def execute_CALL_FUNCTION(self, argc):
         """
         Calls a function. The low byte of argc indicates the number of positional parameters, the high byte the number of keyword
         parameters. On the stack, the opcode finds the keyword parameters first. For each keyword argument, the value is on top of
@@ -814,7 +814,7 @@ class BytecodeVM:
         value = vm.value
         self.__stack.append(value)
 
-    def visit_MAKE_FUNCTION(self, argc):
+    def execute_MAKE_FUNCTION(self, argc):
         """
         Pushes a new function object on the stack. From bottom to top, the consumed stack must consist of argc & 0xFF default argument
         objects in positional order (argc >> 8) & 0xFF pairs of name and default argument, with the name just below the object on the
@@ -824,7 +824,7 @@ class BytecodeVM:
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_MAKE_CLOSURE(self, argc):
+    def execute_MAKE_CLOSURE(self, argc):
         """
         Creates a new function object, sets its __closure__ slot, and pushes it on the stack. TOS is the qualified name of the function,
         TOS1 is the code associated with the function, and TOS2 is the tuple containing cells for the closure’s free variables. argc is
@@ -832,7 +832,7 @@ class BytecodeVM:
         """
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
-    def visit_BUILD_SLICE(self, argc):
+    def execute_BUILD_SLICE(self, argc):
         """
         Pushes a slice object on the stack. argc must be 2 or 3. If it is 2, slice(TOS1, TOS) is pushed; if it is 3, slice(TOS2, TOS1, TOS)
         is pushed. See the slice() built-in function for more information.
@@ -840,7 +840,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_EXTENDED_ARG(self, ext):
+    def execute_EXTENDED_ARG(self, ext):
         """
         Prefixes any opcode which has an argument too big to fit into the default two bytes. ext holds two additional bytes which, taken
         together with the subsequent opcode’s argument, comprise a four-byte argument, ext being the two most-significant bytes.
@@ -848,7 +848,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_CALL_FUNCTION_VAR(self, argc):
+    def execute_CALL_FUNCTION_VAR(self, argc):
         """
         Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the variable argument list,
         followed by keyword and positional arguments.
@@ -856,7 +856,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_CALL_FUNCTION_KW(self, argc):
+    def execute_CALL_FUNCTION_KW(self, argc):
         """
         Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,
         followed by explicit keyword and positional arguments.
@@ -864,7 +864,7 @@ class BytecodeVM:
         raise NotImplementedError("Method %s not implemented" % sys._getframe().f_code.co_name)
 
 
-    def visit_CALL_FUNCTION_VAR_KW(self, argc):
+    def execute_CALL_FUNCTION_VAR_KW(self, argc):
         """
         Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,
         followed by the variable-arguments tuple, followed by explicit keyword and positional arguments.            
