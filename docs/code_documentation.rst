@@ -1,8 +1,12 @@
 Code Documentation
 ==================
-ir
-main
-optimizer
-pyjit
-utils
-vm
+
+.. toctree::
+   :maxdepth: 4
+
+   ir
+   main
+   optimizer
+   pyjit
+   utils
+   vm

@@ -31,6 +31,7 @@
 
   
     <link rel="top" title="SpiderJIT 0.1 documentation" href="index.html"/>
+        <link rel="next" title="ir package" href="ir.html"/>
         <link rel="prev" title="Spider JIT" href="design_overall.html"/> 
 
   
@@ -67,7 +68,15 @@
 <li class="toctree-l2"><a class="reference internal" href="design_overall.html#overall-design">Overall Design</a></li>
 </ul>
 </li>
-<li class="toctree-l1 current"><a class="current reference internal" href="">Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vm.html">vm package</a></li>
+</ul>
+</li>
 </ul>
 
           
@@ -105,12 +114,61 @@
             
   <div class="section" id="code-documentation">
 <h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
-<p>ir
-main
-optimizer
-pyjit
-utils
-vm</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="ir.html">ir package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.base_ir_visitor">ir.base_ir_visitor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.codegen">ir.codegen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.constants">ir.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.context">ir.context module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.exceptions">ir.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.function">ir.function module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.instructions">ir.instructions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.interpreter">ir.interpreter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.irbuilder">ir.irbuilder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.module">ir.module module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.types">ir.types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.utils">ir.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.validator">ir.validator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.value">ir.value module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimizer.html">optimizer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.basicpass">optimizer.basicpass module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.pass_support">optimizer.pass_support module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.passmanager">optimizer.passmanager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pyjit.html">pyjit package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.codegen">pyjit.codegen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.decorators">pyjit.decorators module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.nodes">pyjit.nodes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.pretty_print">pyjit.pretty_print module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.type_infer">pyjit.type_infer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.visitors">pyjit.visitors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.base_visitor">utils.base_visitor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="vm.html">vm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="vm.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vm.html#module-vm.vm">vm.vm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="vm.html#module-vm">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
 </div>
 
 
@@ -118,6 +176,8 @@ vm</p>
           <footer>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ir.html" class="btn btn-neutral float-right" title="ir package">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="design_overall.html" class="btn btn-neutral" title="Spider JIT"><span class="fa fa-arrow-circle-left"></span> Previous</a>
