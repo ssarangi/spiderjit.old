@@ -227,7 +227,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  (master_doc, 'src.tex', 'src Documentation',
+  (master_doc, 'spiderjit.tex', 'SpiderJIT Documentation',
    'Author', 'manual'),
 ]
 
@@ -257,7 +257,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'src', 'src Documentation',
+    (master_doc, 'spiderjit', 'SpiderJIT Documentation',
      [author], 1)
 ]
 
@@ -271,7 +271,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  (master_doc, 'src', 'src Documentation',
+  (master_doc, 'spiderjit', 'SpiderJIT Documentation',
    author, 'src', 'One line description of project.',
    'Miscellaneous'),
 ]
