@@ -179,7 +179,7 @@ class IRVirtualMachine(IRBaseVisitor):
         bb_false = node.bb_false
 
         cmp_res = self.__current_frame.get_symbol(cmp_inst)
-        if (cmp_res == cmp_val):
+        if cmp_res == cmp_val:
             self.__ip = bb_true
         else:
             self.__ip = bb_false
@@ -190,9 +190,6 @@ class IRVirtualMachine(IRBaseVisitor):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
     def visit_switchinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
-
-    def visit_selectinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
     # @verify(node=ICmpInstruction)
