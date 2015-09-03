@@ -1,7 +1,8 @@
 from utils.base_visitor import *
 
 class IRBaseVisitor(BaseVisitor):
-    def __init__(self, node):
+    def __init__(self):
+        BaseVisitor.__init__(self)
         pass
 
     def visit_module(self, node):

@@ -55,6 +55,7 @@ class Frame:
 
 class IRVirtualMachine(IRBaseVisitor):
     def __init__(self):
+        IRBaseVisitor.__init__(self)
         self.__global_frame = Frame("module")
         self.__frames = []
         self.__ip = None
@@ -152,19 +153,19 @@ class IRVirtualMachine(IRBaseVisitor):
         self.visit_binop(operator.mul, node)
 
     def visit_divinstruction(self, node):
-        self.visit_binop(operator.truediv, node)
+        self.visit_binop(operator.floordiv, node)
 
     def visit_faddinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_binop(operator.add, node)
 
     def visit_fsubinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_binop(operator.sub, node)
 
     def visit_fmulinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_binop(operator.mul, node)
 
     def visit_fdivinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_binop(operator.truediv, node)
 
     def visit_allocainstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
@@ -206,7 +207,9 @@ class IRVirtualMachine(IRBaseVisitor):
         self.__current_frame.add_to_frame(node, val)
 
     def visit_fcmpinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        # Just call the icmp version itself since python doesn't distinguish between int and floats
+        # for compare operators
+        self.visit_icmpinstruction(node)
 
     def visit_castinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
