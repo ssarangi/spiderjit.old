@@ -11,6 +11,8 @@ Contents:
 .. toctree::
    :maxdepth: 4
 
+   design_overall
+
    ir
    main
    optimizer
