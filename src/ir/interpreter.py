@@ -17,6 +17,15 @@ COMPARE_OPERATORS = {
     CompareTypes.SGE: operator.ge,
 }
 
+BITWISE_BINARY_OPERATORS = {
+    BitwiseBinaryInstruction.SHL: operator.ilshift,
+    BitwiseBinaryInstruction.ASHR: operator.irshift,
+    BitwiseBinaryInstruction.LSHR: operator.rshift,
+    BitwiseBinaryInstruction.AND: operator.iand,
+    BitwiseBinaryInstruction.OR: operator.ior,
+    BitwiseBinaryInstruction.XOR: operator.xor,
+}
+
 class Frame:
     def __init__(self, name):
         self.__symbols = {}
@@ -104,7 +113,18 @@ class IRVirtualMachine(IRBaseVisitor):
         self.__current_frame = self.__frames.pop()
 
     def visit_selectinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        condition = node.condition
+        val_true = node.val_true
+        val_false = node.val_false
+
+        condition_sym = self.__current_frame.get_symbol(condition)
+
+        if condition_sym is True:
+            val_true_sym = self.__current_frame.get_symbol(val_true)
+            self.__current_frame.add_to_frame(node, val_true_sym)
+        else:
+            val_false_sym = self.__current_frame.get_symbol(val_false)
+            self.__current_frame.add_to_frame(node, val_false_sym)
 
     def visit_loadinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
@@ -203,20 +223,30 @@ class IRVirtualMachine(IRBaseVisitor):
     def visit_insertelementinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
+    def visit_bitwise_binop(self, op, node):
+        op1 = node.op1
+        op2 = node.op2
+
+        op1_sym = self.__current_frame.get_symbol(op1)
+        op2_sym = self.__current_frame.get_symbol(op2)
+
+        res = op(op1_sym, op2_sym)
+        self.__current_frame.add_to_frame(node, res)
+
     def visit_shiftleftinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_bitwise_binop(operator.ilshift, node)
 
     def visit_logicalshiftrightinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_bitwise_binop(operator.rshift, node)
 
     def visit_arithmeticshiftrightinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_bitwise_binop(operator.irshift, node)
 
     def visit_andinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_bitwise_binop(operator.iand, node)
 
     def visit_orinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_bitwise_binop(operator.ior, node)
 
     def visit_xorinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit_xorinstruction(operator.ixor, node)

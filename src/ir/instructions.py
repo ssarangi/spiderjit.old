@@ -548,7 +548,7 @@ class BitwiseBinaryInstruction(Instruction):
         else:
             raise InvalidTypeException("Invalid Bitwise Binary operator: %s encountered" % self.__operator)
 
-        output_str += str(self.__op1) + ", " + str(self.__op2)
+        output_str += " " + str(self.__op1) + ", " + str(self.__op2)
         return output_str
 
     __repr__ = __str__

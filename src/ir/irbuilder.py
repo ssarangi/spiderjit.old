@@ -184,6 +184,36 @@ class IRBuilder:
     def create_store(self):
         pass
 
+    def create_shl(self, op1, op2, name=None):
+        shl_inst = ShiftLeftInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(shl_inst)
+        return shl_inst
+
+    def create_lshr(self, op1, op2, name=None):
+        lshr_inst = LogicalShiftRightInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(lshr_inst)
+        return lshr_inst
+
+    def create_ashr(self, op1, op2, name=None):
+        ashr_inst = ArithmeticShiftRightInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(ashr_inst)
+        return ashr_inst
+
+    def create_and(self, op1, op2, name=None):
+        and_inst = AndInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(and_inst)
+        return and_inst
+
+    def create_or(self, op1, op2, name=None):
+        or_inst = OrInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(or_inst)
+        return or_inst
+
+    def create_xor(self, op1, op2, name=None):
+        xor_inst = XorInstruction(op1, op2, self.__current_bb, name)
+        self.__add_instruction(xor_inst)
+        return xor_inst
+
     def create_vector(self, baseTy, numElts, name=None):
         vecTy = VectorType(baseTy, numElts)
         alloca = self.create_alloca(vecTy, 1, None, name)

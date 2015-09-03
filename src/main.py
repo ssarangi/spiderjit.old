@@ -36,6 +36,7 @@ def generate_ir():
     irfib.basic_blocks.append(thenblock)
 
     irbuilder.insert_after(ifcont)
+    irbuilder.create_or(IntConstant(32, 15), IntConstant(32, 11))
     irbuilder.create_return(IntConstant(32, 1))
 
     irbuilder.insert_after(thenblock)
