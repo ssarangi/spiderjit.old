@@ -32,6 +32,14 @@ class IntConstant(Constant):
     def __str__(self):
         return str(self.__type) + " " + str(self.__initializer)
 
+class BoolConstant(IntConstant):
+    def __init__(self, initializer):
+        IntConstant.__init__(self, 8, initializer)
+
+    def __str__(self):
+        return str(self.type) + " " + str(self.initializer)
+
+
 class FloatConstant(Constant):
     def __init__(self, initializer):
         Constant.__init__(self)
@@ -73,7 +81,6 @@ class DoubleConstant(Constant):
     def __str__(self):
         return str(self.__type) + " " + str(self.__initializer)
 
-
 class StrConstant(Constant):
     def __init__(self):
         Constant.__init__(self)
@@ -92,3 +99,11 @@ class StrConstant(Constant):
 
     def __str__(self):
         return ""
+
+
+class Vector(Value):
+    def __init__(self, vecTy):
+        self.__vecTy = vecTy
+
+    def type(self):
+        return self.__vecTy

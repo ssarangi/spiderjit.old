@@ -16,8 +16,6 @@ def render_list_with_parens(custom_list):
     output_str = "("
     for idx, i in enumerate(custom_list):
         if hasattr(i, "name"):
-            if not isinstance(i, Constant):
-                output_str += "%"
             output_str += i.name
         else:
             output_str += str(i)

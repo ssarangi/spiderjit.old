@@ -1,7 +1,5 @@
 __author__ = 'sarangis'
 
-from ir.value import *
-from ir.types import *
 from ir.utils import *
 from ir.constants import *
 
@@ -62,7 +60,7 @@ class Instruction(Value):
 
     @property
     def name(self):
-        if self.__name == None:
+        if self.__name is None:
             return None
 
         return "%" + self.__name
@@ -107,6 +105,8 @@ class CallInstruction(Instruction):
 
         return output_str
 
+    __repr__ = __str__
+
 
 class TerminateInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -134,29 +134,33 @@ class ReturnInstruction(Instruction):
             output_str = "return " + str(self.__value)
         return output_str
 
+    __repr__ = __str__
+
 
 class SelectInstruction(Instruction):
-    def __init__(self, cond, val1, val2, parent=None, name=None):
-        Instruction.__init__(self, [cond, val1, val2], parent, name)
+    def __init__(self, cond, val_true, val_false, parent=None, name=None):
+        Instruction.__init__(self, [cond, val_true, val_false], parent, name)
         self.__cond = cond
-        self.__val1 = val1
-        self.__val2 = val2
+        self.__val_true = val_true
+        self.__val_false = val_false
 
     @property
     def condition(self):
         return self.__cond
 
     @property
-    def val1(self):
-        return self.__val1
+    def val_true(self):
+        return self.__val_true
 
     @property
-    def val2(self):
-        return self.__val2
+    def val_false(self):
+        return self.__val_false
 
     def __str__(self):
-        output_str = "select " + str(self.__cond) + " " + str(self.__val1) + " " + str(self.__val2)
+        output_str = "select " + str(self.__cond) + " " + str(self.__val_true) + " " + str(self.__val_false)
         return output_str
+
+    __repr__ = __str__
 
 
 class LoadInstruction(Instruction):
@@ -205,7 +209,6 @@ class BinOpInstruction(Instruction):
         return  self.__rhs
 
     def __str__(self):
-        output_str = ""
         if self.__operator == BinOpInstruction.OP_ADD:
             output_str = "add"
         elif self.__operator == BinOpInstruction.OP_SUB:
@@ -219,6 +222,8 @@ class BinOpInstruction(Instruction):
 
         output_str += render_list_with_parens(self.operands)
         return output_str
+
+    __repr__ = __str__
 
 
 class AddInstruction(BinOpInstruction):
@@ -263,7 +268,6 @@ class FBinOpInstruction(Instruction):
         return  self.__rhs
 
     def __str__(self):
-        output_str = ""
         if self.__operator == BinOpInstruction.OP_ADD:
             output_str = "fadd"
         elif self.__operator == BinOpInstruction.OP_SUB:
@@ -277,6 +281,8 @@ class FBinOpInstruction(Instruction):
 
         output_str += render_list_with_parens(self.operands)
         return output_str
+
+    __repr__ = __str__
 
 class FAddInstruction(FBinOpInstruction):
     def __init__(self, lhs, rhs, parent=None, name=None):
@@ -295,11 +301,36 @@ class FDivInstruction(FBinOpInstruction):
         FBinOpInstruction.__init__(self, FBinOpInstruction.OP_DIV, lhs, rhs, parent, name)
 
 class AllocaInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, alloca_type, numEls=None, align=None, parent=None, name=None):
         Instruction.__init__(self, [], parent, name)
+        self.__alloca_type = alloca_type
+        self.__numEls = numEls
+        self.__align = align
+
+    @property
+    def type(self):
+        return PointerType(self.__alloca_type, 0)
+
+    @property
+    def numEls(self):
+        return self.__numEls
+
+    @property
+    def alignment(self):
+        return self.__align
 
     def __str__(self):
-        pass
+        output_str = "alloca "
+        output_str += str(self.type) + " "
+        if self.numEls is not None:
+            output_str += ", i32 %s" % self.numEls
+
+        if self.alignment is not None:
+            output_str += ", align %s" % self.alignment
+
+        return output_str
+
+    __repr__ = __str__
 
 
 class PhiInstruction(Instruction):
@@ -345,7 +376,7 @@ class ConditionalBranchInstruction(BranchInstruction):
         return self.__bb_false
 
     def __str__(self):
-        output_str = "br %"
+        output_str = "br "
         output_str += self.__cmp_inst.name + " "
         output_str += str(self.__value) + ","
         output_str += " label %" + str(self.__bb_true.name) + ", label %" + str(self.__bb_false.name)
@@ -361,13 +392,6 @@ class IndirectBranchInstruction(BranchInstruction):
 
 
 class SwitchInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
-        Instruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
-
-class SelectInstruction(Instruction):
     def __init__(self, parent=None, name=None):
         Instruction.__init__(self, [], parent, name)
 
@@ -461,8 +485,18 @@ class GEPInstruction(Instruction):
 
 
 class ExtractElementInstruction(Instruction):
-    def __init__(self, parent=None, name=None):
+    def __init__(self, vec, idx, parent=None, name=None):
         Instruction.__init__(self, [], parent, name)
+        self.__vec = vec
+        self.__idx = idx
+
+    @property
+    def vec(self):
+        return self.__vec
+
+    @property
+    def idx(self):
+        return self.__idx
 
     def __str__(self):
         pass
@@ -477,10 +511,18 @@ class InsertElementInstruction(Instruction):
 
 
 class BitwiseBinaryInstruction(Instruction):
-    def __init__(self, op1, op2, parent=None, name=None):
+    SHL = 0
+    LSHR = 1
+    ASHR = 2
+    AND = 3
+    OR = 4
+    XOR = 5
+
+    def __init__(self, op, op1, op2, parent=None, name=None):
         Instruction.__init__(self, [op1, op2], parent, name)
         self.__op1 = op1
         self.__op2 = op2
+        self.__operator = op
 
     @property
     def op1(self):
@@ -491,50 +533,55 @@ class BitwiseBinaryInstruction(Instruction):
         return self.__op2
 
     def __str__(self):
-        pass
+        if self.__operator == BitwiseBinaryInstruction.SHL:
+            output_str = "shl"
+        elif self.__operator == BitwiseBinaryInstruction.LSHR:
+            output_str = "lshr"
+        elif self.__operator == BitwiseBinaryInstruction.ASHR:
+            output_str = "ashr"
+        elif self.__operator == BitwiseBinaryInstruction.AND:
+            output_str = "and"
+        elif self.__operator == BitwiseBinaryInstruction.OR:
+            output_str = "or"
+        elif self.__operator == BitwiseBinaryInstruction.XOR:
+            output_str = "xor"
+        else:
+            raise InvalidTypeException("Invalid Bitwise Binary operator: %s encountered" % self.__operator)
+
+        output_str += str(self.__op1) + ", " + str(self.__op2)
+        return output_str
+
+    __repr__ = __str__
 
 class ShiftLeftInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.SHL, op1, op2, parent, name)
 
-    def __str__(self):
-        pass
 
 class LogicalShiftRightInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.LSHR, op1, op2, parent, name)
 
-    def __str__(self):
-        pass
 
 class ArithmeticShiftRightInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, [], parent, name)
-
-    def __str__(self):
-        pass
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.ASHR, op1, op2, parent, name)
 
 
 class AndInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.AND, op1, op2, parent, name)
 
-    def __str__(self):
-        pass
 
 class OrInstruction(BitwiseBinaryInstruction):
     def __init__(self, op1, op2, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, op1, op2, parent, name)
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.OR, op1, op2, parent, name)
 
-    def __str__(self):
-        pass
 
 class XorInstruction(BitwiseBinaryInstruction):
-    def __init__(self, parent=None, name=None):
-        BitwiseBinaryInstruction.__init__(self, [], parent, name)
+    def __init__(self, op1, op2, parent=None, name=None):
+        BitwiseBinaryInstruction.__init__(self, BitwiseBinaryInstruction.XOR, op1, op2, parent, name)
 
-    def __str__(self):
-        pass
 
 class BasicBlock(Validator):
     def __init__(self, name, parent):

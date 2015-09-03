@@ -167,3 +167,25 @@ class IRBuilder:
         icmp_inst = ICmpInstruction(CompareTypes.SLE, lhs, rhs, self.__current_bb, name)
         self.__add_instruction(icmp_inst)
         return icmp_inst
+
+    def create_select(self, cond, val_true, val_false, name=None):
+        select_inst = SelectInstruction(cond, val_true, val_false, self.__current_bb, name)
+        self.__add_instruction(select_inst)
+        return select_inst
+
+    def create_alloca(self, type, numEls=None, align=None, name=None):
+        alloca_inst = AllocaInstruction(type, numEls, align, self.__current_bb, name)
+        self.__add_instruction(alloca_inst)
+        return alloca_inst
+
+    def create_load(self):
+        pass
+
+    def create_store(self):
+        pass
+
+    def create_vector(self, baseTy, numElts, name=None):
+        vecTy = VectorType(baseTy, numElts)
+        alloca = self.create_alloca(vecTy, 1, None, name)
+        vec = self.create_load(alloca)
+        return vec

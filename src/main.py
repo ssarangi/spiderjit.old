@@ -1,12 +1,7 @@
 ﻿__author__ = 'sarangis'
 
-from ir.module import *
-from ir.context import *
-from ir.irbuilder import *
-from ir.constants import *
 from optimizer.passmanager import *
 from optimizer.basicpass import *
-from pyjit.pretty_print import *
 from pyjit.decorators import *
 from vm.vm import *
 from ir.interpreter import *
