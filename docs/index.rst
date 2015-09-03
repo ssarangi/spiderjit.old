@@ -12,14 +12,7 @@ Contents:
    :maxdepth: 4
 
    design_overall
-
-   ir
-   main
-   optimizer
-   pyjit
-   utils
-   vm
-
+   code_documentation
 
 Indices and tables
 ==================
