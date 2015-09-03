@@ -1,25 +1,19 @@
-This is a Title
+Spider JIT
 ===============
-That has a paragraph about a main subject and is set when the '='
-is at least the same length of the title itself.
+Spider JIT is a jitter which has been written mainly for educational purposes.
+The entire code is 'mostly' written in python with some amount of C used where
+necessary. However, speed is not the most important criteria in this case and
+most of the emphasis has been on how to make this compiler more readily accessible
+to read for newbies. This jitter doesn't attempt to compete with Numba/PyPy or the
+likes of Pyston. Infact most of the motivation has come from these great projects
+themselves. If you are looking for production quality code then I would suggest
+the above projects.
 
-Subject Subtitle
+Overall Design
 ----------------
-Subtitles are set with '-' and are required to have the same length
-of the subtitle itself, just like titles.
+Overall, Spider JIT can be conveniently broken down into 3 pieces (as is true for
+most compilers). They are:
 
-Lists can be unnumbered like:
-
- * Item Foo
- * Item Bar
-
-Or automatically numbered:
-
- #. Item 1
- #. Item 2
-
-Inline Markup
--------------
-Words can have *emphasis in italics* or be **bold** and you can define
-code samples with back quotes, like when you talk about a command: ``sudo``
-gives you super user powers!
+ * Frontend module (currently implements Python)
+ * Midend module (Optimization layer)
+ * Codegen module (Final x86 code generation)

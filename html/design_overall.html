@@ -7,7 +7,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>This is a Title &mdash; SpiderJIT 0.1 documentation</title>
+  <title>Spider JIT &mdash; SpiderJIT 0.1 documentation</title>
   
 
   
@@ -64,9 +64,8 @@
           
           
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="">This is a Title</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#subject-subtitle">Subject Subtitle</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#inline-markup">Inline Markup</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#overall-design">Overall Design</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="ir.html">ir package</a><ul>
@@ -144,7 +143,7 @@
   <ul class="wy-breadcrumbs">
     <li><a href="index.html">Docs</a> &raquo;</li>
       
-    <li>This is a Title</li>
+    <li>Spider JIT</li>
       <li class="wy-breadcrumbs-aside">
         
           <a href="_sources/design_overall.txt" rel="nofollow"> View page source</a>
@@ -155,34 +154,27 @@
 </div>
           <div role="main" class="document">
             
-  <div class="section" id="this-is-a-title">
-<h1>This is a Title<a class="headerlink" href="#this-is-a-title" title="Permalink to this headline">¶</a></h1>
-<p>That has a paragraph about a main subject and is set when the &#8216;=&#8217;
-is at least the same length of the title itself.</p>
-<div class="section" id="subject-subtitle">
-<h2>Subject Subtitle<a class="headerlink" href="#subject-subtitle" title="Permalink to this headline">¶</a></h2>
-<p>Subtitles are set with &#8216;-&#8216; and are required to have the same length
-of the subtitle itself, just like titles.</p>
-<p>Lists can be unnumbered like:</p>
+  <div class="section" id="spider-jit">
+<h1>Spider JIT<a class="headerlink" href="#spider-jit" title="Permalink to this headline">¶</a></h1>
+<p>Spider JIT is a jitter which has been written mainly for educational purposes.
+The entire code is &#8216;mostly&#8217; written in python with some amount of C used where
+necessary. However, speed is not the most important criteria in this case and
+most of the emphasis has been on how to make this compiler more readily accessible
+to read for newbies. This jitter doesn&#8217;t attempt to compete with Numba/PyPy or the
+likes of Pyston. Infact most of the motivation has come from these great projects
+themselves. If you are looking for production quality code then I would suggest
+the above projects.</p>
+<div class="section" id="overall-design">
+<h2>Overall Design<a class="headerlink" href="#overall-design" title="Permalink to this headline">¶</a></h2>
+<p>Overall, Spider JIT can be conveniently broken down into 3 pieces (as is true for
+most compilers). They are:</p>
 <blockquote>
 <div><ul class="simple">
-<li>Item Foo</li>
-<li>Item Bar</li>
+<li>Frontend module (currently implements Python)</li>
+<li>Midend module (Optimization layer)</li>
+<li>Codegen module (Final x86 code generation)</li>
 </ul>
 </div></blockquote>
-<p>Or automatically numbered:</p>
-<blockquote>
-<div><ol class="arabic simple">
-<li>Item 1</li>
-<li>Item 2</li>
-</ol>
-</div></blockquote>
-</div>
-<div class="section" id="inline-markup">
-<h2>Inline Markup<a class="headerlink" href="#inline-markup" title="Permalink to this headline">¶</a></h2>
-<p>Words can have <em>emphasis in italics</em> or be <strong>bold</strong> and you can define
-code samples with back quotes, like when you talk about a command: <code class="docutils literal"><span class="pre">sudo</span></code>
-gives you super user powers!</p>
 </div>
 </div>
 
