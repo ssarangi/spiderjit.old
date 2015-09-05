@@ -33,6 +33,7 @@ class Instruction(Value):
         self.__name = name
         self.__needs_name = needs_name
         self.__operands = operands
+        self.__uses = []
 
     @property
     def operands(self):
@@ -346,18 +347,28 @@ class BranchInstruction(Instruction):
         Instruction.__init__(self, [bb], parent, name, needs_name=False)
         self.__bb = bb
 
+        if parent is not None:
+            parent.add_successor = bb
+            bb.add_predecesssor = parent
+
     def __str__(self):
         output_str = "br " + self.__bb.name
         return output_str
 
 
-class ConditionalBranchInstruction(BranchInstruction):
+class ConditionalBranchInstruction(Instruction):
     def __init__(self, cmp_inst, value, bb_true, bb_false, parent=None, name=None):
-        BranchInstruction.__init__(self, None, parent, name)
+        Instruction.__init__(self, parent, name)
         self.__cmp_inst = cmp_inst
         self.__value = value
         self.__bb_true = bb_true
         self.__bb_false = bb_false
+
+        if parent is not None:
+            parent.add_successor(bb_true)
+            parent.add_successor(bb_false)
+            bb_true.add_predecessor(parent)
+            bb_false.add_predecessor(parent)
 
     @property
     def cmp_inst(self):
@@ -588,6 +599,22 @@ class BasicBlock(Validator):
         self.__name = name
         self.__parent = parent
         self.__instructions = InstructionList(parent.name_generator)
+        self.__predecessors = []
+        self.__successors = []
+
+    @property
+    def predecessors(self):
+        return self.__predecessors
+
+    @property
+    def successor(self):
+        return self.__successors
+
+    def add_predecessor(self, predecessor):
+        self.__predecessors.append(predecessor)
+
+    def add_successor(self, successor):
+        self.__successors.append(successor)
 
     @property
     def name(self):
@@ -624,7 +651,11 @@ class BasicBlock(Validator):
             raise NoBBTerminatorException(error_str)
 
     def __str__(self):
-        output_str = self.name + ":\n"
+        predecessor_names = [p.name for p in self.__predecessors]
+        successor_names = [p.name for p in self.__successors]
+        output_str = "; pred: " + str(predecessor_names) + "\n"
+        output_str += "; succ: " + str(successor_names) + "\n"
+        output_str += self.name + ":\n"
         for i in self.__instructions:
             output_str += "\t"
 

@@ -101,20 +101,20 @@ class IRBuilder:
         bb = BasicBlock(name, parent)
         return bb
 
-    def create_return(self, value = None):
+    def create_return(self, value = None, name=None):
         ret_inst = ReturnInstruction(value)
         self.__add_instruction(ret_inst)
 
-    def create_branch(self, bb):
+    def create_branch(self, bb, name=None):
         if not isinstance(bb, BasicBlock):
             raise InvalidTypeException("Expected a Basic Block")
 
-        branch_inst = BranchInstruction(bb)
+        branch_inst = BranchInstruction(bb, self.__current_bb, name)
         self.__add_instruction(branch_inst)
         return branch_inst
 
-    def create_cond_branch(self, cmp_inst, value, bb_true, bb_false):
-        cond_branch = ConditionalBranchInstruction(cmp_inst, value, bb_true, bb_false)
+    def create_cond_branch(self, cmp_inst, value, bb_true, bb_false, name=None):
+        cond_branch = ConditionalBranchInstruction(cmp_inst, value, bb_true, bb_false, self.__current_bb, name)
         self.__add_instruction(cond_branch)
         return cond_branch
 
