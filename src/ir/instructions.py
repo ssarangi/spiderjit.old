@@ -652,12 +652,13 @@ class BasicBlock(Validator):
 
     def __str__(self):
         predecessor_names = [p.name for p in self.__predecessors]
-        successor_names = [p.name for p in self.__successors]
-        output_str = "; pred: " + str(predecessor_names) + "\n"
-        output_str += "; succ: " + str(successor_names) + "\n"
-        output_str += self.name + ":\n"
+        output_str = self.name + ": "
+        if len(predecessor_names) > 0:
+            output_str += "; pred: " + str(predecessor_names)
+
+        output_str += "\n"
         for i in self.__instructions:
-            output_str += "\t"
+            output_str += " " * 4
 
             if i.name is not None:
                 output_str += i.name + " = "
