@@ -220,14 +220,14 @@
         </div>
         <div class="col-md-5">
           <!-- <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image"> -->
-          <pre><code class="python">
+          <pre><code class="python" center-block>
 Module: MyModule
 Target Datalayout: []
 Target Arch:
 define i32 main() {
-  entry:
-    %0 = call i32 @fib(9)
-    return %0
+entry:
+  %0 = call i32 @fib(9)
+  return %0
 }
 
 define i32 fib(i32 %n) {
