@@ -170,7 +170,7 @@ class Function(Validator):
 
         # render each basic block
         for bb in self.__basic_blocks:
-            output_str += str(bb)
+            output_str += bb.render()
 
         output_str += "}\n\n"
         return output_str

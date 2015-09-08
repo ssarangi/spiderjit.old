@@ -26,14 +26,27 @@ class InstructionList(list):
 
 
 class Instruction(Value):
-    def __init__(self, operands = None, parent=None, name=None, needs_name=True):
+    @verify(operands=list)
+    def __init__(self, operands=[], parent=None, name=None, needs_name=True):
         Value.__init__(self)
         self.__parent = parent
         self.__inst_idx = -1
         self.__name = name
         self.__needs_name = needs_name
+
         self.__operands = operands
         self.__uses = []
+
+        for operand in operands:
+            if isinstance(operand, Instruction):
+                operand.add_use(self)
+
+    @property
+    def uses(self):
+        return self.__uses
+
+    def add_use(self, use):
+        self.__uses.append(use)
 
     @property
     def operands(self):
@@ -358,7 +371,7 @@ class BranchInstruction(Instruction):
 
 class ConditionalBranchInstruction(Instruction):
     def __init__(self, cmp_inst, value, bb_true, bb_false, parent=None, name=None):
-        Instruction.__init__(self, parent, name)
+        Instruction.__init__(self, [cmp_inst, bb_true, bb_false], parent, name)
         self.__cmp_inst = cmp_inst
         self.__value = value
         self.__bb_true = bb_true
@@ -454,8 +467,9 @@ class CompareInstruction(Instruction):
         return self.__op2
 
     def __str__(self):
-        pass
+        return "Compare Instruction"
 
+    __repr__ = __str__
 
 class ICmpInstruction(CompareInstruction):
     def __init__(self, cond, op1, op2, parent=None, name=None):
@@ -467,6 +481,7 @@ class ICmpInstruction(CompareInstruction):
         output_str += " " + str(self.op1) + ", " + str(self.op2)
         return output_str
 
+    __repr__ = __str__
 
 class FCmpInstruction(CompareInstruction):
     def __init__(self, cond, op1, op2, parent=None, name=None):
@@ -479,6 +494,8 @@ class FCmpInstruction(CompareInstruction):
         return output_str
 
 
+    __repr__ = __str__
+
 class CastInstruction(Instruction):
     def __init__(self, parent=None, name=None):
         Instruction.__init__(self, [], parent, name)
@@ -486,6 +503,7 @@ class CastInstruction(Instruction):
     def __str__(self):
         pass
 
+    __repr__ = __str__
 
 class GEPInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -494,6 +512,7 @@ class GEPInstruction(Instruction):
     def __str__(self):
         pass
 
+    __repr__ = __str__
 
 class ExtractElementInstruction(Instruction):
     def __init__(self, vec, idx, parent=None, name=None):
@@ -512,6 +531,7 @@ class ExtractElementInstruction(Instruction):
     def __str__(self):
         pass
 
+    __repr__ = __str__
 
 class InsertElementInstruction(Instruction):
     def __init__(self, parent=None, name=None):
@@ -520,6 +540,7 @@ class InsertElementInstruction(Instruction):
     def __str__(self):
         pass
 
+    __repr__ = __str__
 
 class BitwiseBinaryInstruction(Instruction):
     SHL = 0
@@ -607,7 +628,7 @@ class BasicBlock(Validator):
         return self.__predecessors
 
     @property
-    def successor(self):
+    def successors(self):
         return self.__successors
 
     def add_predecessor(self, predecessor):
@@ -650,7 +671,7 @@ class BasicBlock(Validator):
         else:
             raise NoBBTerminatorException(error_str)
 
-    def __str__(self):
+    def render(self):
         predecessor_names = [p.name for p in self.__predecessors]
         output_str = self.name + ": "
         if len(predecessor_names) > 0:
@@ -666,5 +687,8 @@ class BasicBlock(Validator):
             output_str += str(i) + "\n"
 
         return output_str
+
+    def __str__(self):
+        return self.name
 
     __repr__ = __str__

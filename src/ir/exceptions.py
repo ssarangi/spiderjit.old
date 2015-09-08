@@ -17,3 +17,6 @@ class NoBBTerminatorException(ValueError):
 
 class InvalidUsageModel(ValueError):
     pass
+
+class PassNotRunException(ValueError):
+    pass

@@ -68,8 +68,10 @@ def generate_ir():
     print("Running Passmanager:")
     print("-" * 50)
     passmgr = PassManager()
-    passmgr.add_module_pass(PrintFunctionsPass())
-    passmgr.add_function_pass(PrintBasicBlocksPass())
+    # passmgr.add_module_pass(PrintFunctionsPass())
+    # passmgr.add_function_pass(PrintBasicBlocksPass())
+    # passmgr.add_function_pass(PrintInstructionUsesPass())
+    passmgr.add_function_pass(DominatorTreeAnalysisPass())
     passmgr.run(mod)
 
     print("-" * 50)
