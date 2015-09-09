@@ -201,8 +201,8 @@ then: ; pred: ['entry']
 
       <div class="row featurette">
         <div class="col-md-7 col-md-push-5">
-          <h2 class="featurette-heading">Oh yeah, it's that good. <span class="text-muted">See for yourself.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+          <h2 class="featurette-heading">Multiple Interpreters: <span class="text-muted">Python bytecode interpreter, IR interpreter</span></h2>
+          <p class="lead">SpiderJIT features 2 interpreters at this point. One of them is a bytecode interpreter and the other one is the ir interpreter. The bytecode interpreter will primarily be used for hotspot analysis and as a tracing jit. The IR interpreter on the other hand will be used for verifying the generated code from the frontend. For languages like python, eval along with the ir interpreter will serve the purpose of verification.</p>
         </div>
         <div class="col-md-5 col-md-pull-7">
           <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
