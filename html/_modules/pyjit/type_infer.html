@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>pyjit.type_infer &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design_overall.html">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design_overall.html#overall-design">Overall Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code_documentation.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vm.html">vm package</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>pyjit.type_infer</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for pyjit.type_infer</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;sarangis&#39;</span>
+
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">from</span> <span class="nn">pyjit.nodes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">utils.base_visitor</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="naming"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.naming">[docs]</a><span class="k">def</span> <span class="nf">naming</span><span class="p">():</span>
+    <span class="n">k</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="p">(</span><span class="s">&quot;&#39;&quot;</span> <span class="o">+</span> <span class="n">a</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">k</span><span class="p">))</span> <span class="k">if</span> <span class="p">(</span><span class="n">k</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">else</span> <span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InferType"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType">[docs]</a><span class="k">class</span> <span class="nc">InferType</span><span class="p">(</span><span class="n">BaseVisitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">names</span> <span class="o">=</span> <span class="n">naming</span><span class="p">()</span>
+
+<div class="viewcode-block" id="InferType.fresh"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.fresh">[docs]</a>    <span class="k">def</span> <span class="nf">fresh</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">VarTy</span><span class="p">(</span><span class="s">&#39;$&#39;</span> <span class="o">+</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">names</span><span class="p">))</span>
+</div>
+<div class="viewcode-block" id="InferType.visit"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit">[docs]</a>    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s">&quot;visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)(</span><span class="n">node</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">generic_visit</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Func"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Func">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Func</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">arity</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">argTys</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fresh</span><span class="p">()</span>  <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">retTy</span> <span class="o">=</span> <span class="n">VarTy</span><span class="p">(</span><span class="s">&quot;$retTy&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">ty</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">argTys</span><span class="p">):</span>
+            <span class="n">arg</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">ty</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">arg</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">ty</span>
+
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FuncTy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">argTys</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retTy</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Noop"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Noop">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Noop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_LitInt"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_LitInt">[docs]</a>    <span class="k">def</span> <span class="nf">visit_LitInt</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c">#tv = self.fresh()</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">IntTy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_LitFloat"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_LitFloat">[docs]</a>    <span class="k">def</span> <span class="nf">visit_LitFloat</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c">#tv = self.fresh()</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">FloatTy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_LitBool"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_LitBool">[docs]</a>    <span class="k">def</span> <span class="nf">visit_LitBool</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="c">#tv = self.fresh()</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">BoolTy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_LitString"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_LitString">[docs]</a>    <span class="k">def</span> <span class="nf">visit_LitString</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">StringTy</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">s</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">type</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Assign"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Assign">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Assign</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">ref</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">:</span>
+            <span class="c"># Subsequent uses of a variable must have same type</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">ty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">ref</span><span class="p">])]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">ref</span><span class="p">]</span> <span class="o">=</span> <span class="n">ty</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">ref</span> <span class="o">=</span> <span class="n">ty</span>
+        <span class="k">return</span> <span class="bp">None</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Index"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Index">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Index</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">tv</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fresh</span><span class="p">()</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="n">ixty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">ix</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">ty</span><span class="p">,</span> <span class="n">array</span><span class="p">(</span><span class="n">tv</span><span class="p">)),</span> <span class="p">(</span><span class="n">ixty</span><span class="p">,</span> <span class="n">int32</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="n">tv</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Prim"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Prim">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Prim</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">node</span><span class="o">.</span><span class="n">fn</span> <span class="o">==</span> <span class="s">&quot;shape#&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">array</span><span class="p">(</span><span class="n">int32</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">node</span><span class="o">.</span><span class="n">fn</span> <span class="o">==</span> <span class="s">&quot;mult#&quot;</span> <span class="ow">or</span> <span class="n">node</span><span class="o">.</span><span class="n">fn</span> <span class="o">==</span> <span class="s">&quot;add#&quot;</span><span class="p">:</span>
+            <span class="n">tya</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">tyb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">tya</span><span class="p">,</span> <span class="n">tyb</span><span class="p">)]</span>
+            <span class="k">return</span> <span class="n">tyb</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Var"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Var">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Var</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
+        <span class="n">node</span><span class="o">.</span><span class="n">type</span> <span class="o">=</span> <span class="n">ty</span>
+        <span class="k">return</span> <span class="n">ty</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Return"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Return">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">ty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">retTy</span><span class="p">)]</span>
+</div>
+<div class="viewcode-block" id="InferType.visit_Loop"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.visit_Loop">[docs]</a>    <span class="k">def</span> <span class="nf">visit_Loop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="p">[</span><span class="n">node</span><span class="o">.</span><span class="n">var</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">int32</span>
+        <span class="n">varTy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">var</span><span class="p">)</span>
+        <span class="n">begin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">begin</span><span class="p">)</span>
+        <span class="n">end</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">end</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constraints</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">varTy</span><span class="p">,</span> <span class="n">int32</span><span class="p">),</span> <span class="p">(</span><span class="n">begin</span><span class="p">,</span> <span class="n">int64</span><span class="p">),</span> <span class="p">(</span><span class="n">end</span><span class="p">,</span> <span class="n">int32</span><span class="p">)]</span>
+        <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">body</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="InferType.generic_visit"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferType.generic_visit">[docs]</a>    <span class="k">def</span> <span class="nf">generic_visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;Visitor class doesn&#39;t implement </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">))</span>
+
+<span class="c">#----------------------------------------------------------------------------------------------------------------------#</span></div></div>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<div class="viewcode-block" id="TypeSolver"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.TypeSolver">[docs]</a><span class="k">class</span> <span class="nc">TypeSolver</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="TypeSolver.solve"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.TypeSolver.solve">[docs]</a>    <span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="n">type_constraints</span><span class="p">):</span>
+        <span class="n">constraints</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">type_constraints</span><span class="p">)</span>
+        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">constraints</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">constraint</span> <span class="o">=</span> <span class="n">constraints</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">constraint</span><span class="p">)</span>
+
+<span class="c">#----------------------------------------------------------------------------------------------------------------------#</span>
+</div></div>
+<span class="kn">from</span> <span class="nn">pyjit.nodes</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<div class="viewcode-block" id="empty"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.empty">[docs]</a><span class="k">def</span> <span class="nf">empty</span><span class="p">():</span>
+    <span class="k">return</span> <span class="p">{}</span>
+
+</div>
+<div class="viewcode-block" id="apply"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.apply">[docs]</a><span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">ConstructorTy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">t</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">AppTy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">AppTy</span><span class="p">(</span><span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">a</span><span class="p">),</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">b</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">FuncTy</span><span class="p">):</span>
+        <span class="n">argTys</span> <span class="o">=</span> <span class="p">[</span><span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">t</span><span class="o">.</span><span class="n">argTys</span><span class="p">]</span>
+        <span class="n">retTy</span> <span class="o">=</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="o">.</span><span class="n">retTy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FuncTy</span><span class="p">(</span><span class="n">argTys</span><span class="p">,</span> <span class="n">retTy</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">VarTy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">s</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="applyList"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.applyList">[docs]</a><span class="k">def</span> <span class="nf">applyList</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">xs</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">[(</span><span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">y</span><span class="p">))</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="ow">in</span> <span class="n">xs</span><span class="p">]</span>
+</div>
+<div class="viewcode-block" id="unify"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.unify">[docs]</a><span class="k">def</span> <span class="nf">unify</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">AppTy</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">AppTy</span><span class="p">):</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">unify</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">a</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">a</span><span class="p">)</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">unify</span><span class="p">(</span><span class="nb">apply</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">b</span><span class="p">),</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">b</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">compose</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">ConstructorTy</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">ConstructorTy</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="o">==</span> <span class="n">y</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">empty</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">FuncTy</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">FuncTy</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">argTys</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">argTys</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Wrong number of arguments&quot;</span><span class="p">)</span>
+        <span class="n">s1</span> <span class="o">=</span> <span class="n">solve</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">argTys</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">argTys</span><span class="p">))</span>
+        <span class="n">s2</span> <span class="o">=</span> <span class="n">unify</span><span class="p">(</span><span class="nb">apply</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">retTy</span><span class="p">),</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">y</span><span class="o">.</span><span class="n">retTy</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">compose</span><span class="p">(</span><span class="n">s2</span><span class="p">,</span> <span class="n">s1</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">VarTy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bind</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">VarTy</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">bind</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">InferError</span>
+</div>
+<div class="viewcode-block" id="solve"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.solve">[docs]</a><span class="k">def</span> <span class="nf">solve</span><span class="p">(</span><span class="n">xs</span><span class="p">):</span>
+    <span class="n">mgu</span> <span class="o">=</span> <span class="n">empty</span><span class="p">()</span>
+    <span class="n">cs</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span>
+    <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">cs</span><span class="p">):</span>
+        <span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span> <span class="o">=</span> <span class="n">cs</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">unify</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">)</span>
+        <span class="n">mgu</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mgu</span><span class="p">)</span>
+        <span class="n">cs</span> <span class="o">=</span> <span class="n">deque</span><span class="p">(</span><span class="n">applyList</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">cs</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">mgu</span>
+</div>
+<div class="viewcode-block" id="bind"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.bind">[docs]</a><span class="k">def</span> <span class="nf">bind</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">==</span> <span class="n">n</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">empty</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="n">occurs_check</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;InfiniteType&quot;</span><span class="p">)</span> <span class="c">#InfiniteType(n, x)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">([(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">)])</span>
+</div>
+<div class="viewcode-block" id="occurs_check"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.occurs_check">[docs]</a><span class="k">def</span> <span class="nf">occurs_check</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">ftv</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="union"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.union">[docs]</a><span class="k">def</span> <span class="nf">union</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
+    <span class="n">nenv</span> <span class="o">=</span> <span class="n">s1</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">nenv</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">s2</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">nenv</span>
+</div>
+<div class="viewcode-block" id="compose"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.compose">[docs]</a><span class="k">def</span> <span class="nf">compose</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s2</span><span class="p">):</span>
+    <span class="n">s3</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">((</span><span class="n">t</span><span class="p">,</span> <span class="nb">apply</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">u</span><span class="p">))</span> <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">s2</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+    <span class="k">return</span> <span class="n">union</span><span class="p">(</span><span class="n">s1</span><span class="p">,</span> <span class="n">s3</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="UnderDeteremined"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.UnderDeteremined">[docs]</a><span class="k">class</span> <span class="nc">UnderDeteremined</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;The types in the function are not fully determined by the </span><span class="se">\</span>
+<span class="s">                input types. Add annotations.&quot;</span>
+</div>
+<div class="viewcode-block" id="InferError"><a class="viewcode-back" href="../../pyjit.html#pyjit.type_infer.InferError">[docs]</a><span class="k">class</span> <span class="nc">InferError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ty1</span><span class="p">,</span> <span class="n">ty2</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ty1</span> <span class="o">=</span> <span class="n">ty1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ty2</span> <span class="o">=</span> <span class="n">ty2</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&#39;</span><span class="se">\n</span><span class="s">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
+            <span class="s">&quot;Type mismatch: &quot;</span><span class="p">,</span>
+            <span class="s">&quot;Given: &quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ty1</span><span class="p">),</span>
+            <span class="s">&quot;Expected: &quot;</span><span class="p">,</span> <span class="s">&quot;</span><span class="se">\t</span><span class="s">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ty2</span><span class="p">)</span>
+        <span class="p">])</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ir.interpreter &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design_overall.html">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design_overall.html#overall-design">Overall Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code_documentation.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vm.html">vm package</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>ir.interpreter</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for ir.interpreter</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">ir.module</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.function</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.instructions</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">from</span> <span class="nn">ir.base_ir_visitor</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.validator</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="kn">import</span> <span class="nn">operator</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+
+<span class="n">COMPARE_OPERATORS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">SLT</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">SLE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">EQ</span><span class="p">:</span>  <span class="n">operator</span><span class="o">.</span><span class="n">eq</span><span class="p">,</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">NE</span><span class="p">:</span>  <span class="n">operator</span><span class="o">.</span><span class="n">ne</span><span class="p">,</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">SGT</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">gt</span><span class="p">,</span>
+    <span class="n">CompareTypes</span><span class="o">.</span><span class="n">SGE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span>
+<span class="p">}</span>
+
+<div class="viewcode-block" id="Frame"><a class="viewcode-back" href="../../ir.html#ir.interpreter.Frame">[docs]</a><span class="k">class</span> <span class="nc">Frame</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__symbols</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+<div class="viewcode-block" id="Frame.add_to_frame"><a class="viewcode-back" href="../../ir.html#ir.interpreter.Frame.add_to_frame">[docs]</a>    <span class="k">def</span> <span class="nf">add_to_frame</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__symbols</span><span class="p">[</span><span class="n">node</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+</div>
+<div class="viewcode-block" id="Frame.get_symbol"><a class="viewcode-back" href="../../ir.html#ir.interpreter.Frame.get_symbol">[docs]</a>    <span class="k">def</span> <span class="nf">get_symbol</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">Constant</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">initializer</span>
+
+        <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symbols</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__symbols</span><span class="p">[</span><span class="n">node</span><span class="p">]</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">Constant</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">val</span><span class="o">.</span><span class="n">initializer</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;No symbol found&quot;</span><span class="p">)</span>
+        
+        <span class="k">return</span> <span class="bp">None</span>
+</div></div>
+<div class="viewcode-block" id="IRVirtualMachine"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine">[docs]</a><span class="k">class</span> <span class="nc">IRVirtualMachine</span><span class="p">(</span><span class="n">IRBaseVisitor</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__global_frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="s">&quot;module&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__frames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span> <span class="o">=</span> <span class="n">deque</span><span class="p">([])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">eval_result</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
+
+<div class="viewcode-block" id="IRVirtualMachine.visit_module"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_module">[docs]</a>    <span class="k">def</span> <span class="nf">visit_module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__global_frame</span>
+        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">globals</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__global_frame</span><span class="o">.</span><span class="n">add_to_frame</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">g</span><span class="o">.</span><span class="n">initializer</span><span class="p">)</span>
+
+        <span class="c"># At this point we don&#39;t have support for system arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">entry_point</span><span class="p">,</span> <span class="p">[])</span>
+
+    <span class="c"># @verify(node=Function, arg_list=list)</span></div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_function"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_function">[docs]</a>    <span class="k">def</span> <span class="nf">visit_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
+        <span class="n">frame</span> <span class="o">=</span> <span class="n">Frame</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">arg_list</span><span class="p">),</span> <span class="s">&quot;args passed is of incorrect size&quot;</span>
+        <span class="c"># Iterate through the args and set the values</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">):</span>
+            <span class="n">frame</span><span class="o">.</span><span class="n">add_to_frame</span><span class="p">(</span><span class="n">arg</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
+
+        <span class="c"># Find the first basic block and move there</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">basic_blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__frames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span> <span class="o">=</span> <span class="n">frame</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ip</span><span class="p">)</span>
+</div>
+    <span class="nd">@verify</span><span class="p">(</span><span class="n">node</span><span class="o">=</span><span class="n">BasicBlock</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">visit_basicblock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">inst</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">instructions</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IRVirtualMachine.visit_callinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_callinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_callinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">sym_args</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span> <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">function</span><span class="p">,</span> <span class="n">sym_args</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">add_to_frame</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="o">.</span><span class="n">popleft</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_terminateinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_terminateinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_terminateinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_returninstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_returninstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_returninstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">value</span>
+        <span class="n">val_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__result_stack</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val_sym</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__frames</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+</div>
+    <span class="k">def</span> <span class="nf">visit_selectinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+<div class="viewcode-block" id="IRVirtualMachine.visit_loadinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_loadinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_loadinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_storeinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_storeinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_storeinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_binop"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_binop">[docs]</a>    <span class="k">def</span> <span class="nf">visit_binop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">op</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">lhs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">lhs</span>
+        <span class="n">rhs</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">rhs</span>
+
+        <span class="n">lhs_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">lhs</span><span class="p">)</span>
+        <span class="n">rhs_sym</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+
+        <span class="n">res</span> <span class="o">=</span> <span class="n">op</span><span class="p">(</span><span class="n">lhs_sym</span><span class="p">,</span> <span class="n">rhs_sym</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">add_to_frame</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_addinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_addinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_addinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_binop</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_subinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_subinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_subinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_binop</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_mulinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_mulinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_mulinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_binop</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">mul</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_divinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_divinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_divinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit_binop</span><span class="p">(</span><span class="n">operator</span><span class="o">.</span><span class="n">truediv</span><span class="p">,</span> <span class="n">node</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_faddinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_faddinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_faddinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_fsubinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_fsubinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fsubinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_fmulinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_fmulinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fmulinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_fdivinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_fdivinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fdivinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_allocainstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_allocainstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_allocainstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_phiinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_phiinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_phiinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_conditionalbranchinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_conditionalbranchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_conditionalbranchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">cmp_inst</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">cmp_inst</span>
+        <span class="n">cmp_val</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">cmp_value</span>
+        <span class="n">bb_true</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">bb_true</span>
+        <span class="n">bb_false</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">bb_false</span>
+
+        <span class="n">cmp_res</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">cmp_inst</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">cmp_res</span> <span class="o">==</span> <span class="n">cmp_val</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="n">bb_true</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__ip</span> <span class="o">=</span> <span class="n">bb_false</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ip</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_indirectbranchinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_indirectbranchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_indirectbranchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_switchinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_switchinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_switchinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_selectinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_selectinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_selectinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+
+    <span class="c"># @verify(node=ICmpInstruction)</span></div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_icmpinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_icmpinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_icmpinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">condition</span>
+        <span class="n">op1</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">op1</span>
+        <span class="n">op2</span> <span class="o">=</span> <span class="n">node</span><span class="o">.</span><span class="n">op2</span>
+
+        <span class="c"># find the symbols from the node</span>
+        <span class="n">val1</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">op1</span><span class="p">)</span>
+        <span class="n">val2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">get_symbol</span><span class="p">(</span><span class="n">op2</span><span class="p">)</span>
+
+        <span class="n">val</span> <span class="o">=</span> <span class="n">COMPARE_OPERATORS</span><span class="p">[</span><span class="n">cond</span><span class="p">](</span><span class="n">val1</span><span class="p">,</span> <span class="n">val2</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_frame</span><span class="o">.</span><span class="n">add_to_frame</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_fcmpinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_fcmpinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_fcmpinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_castinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_castinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_castinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_gepinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_gepinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_gepinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_extractelementinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_extractelementinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_extractelementinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_insertelementinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_insertelementinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_insertelementinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_shiftleftinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_shiftleftinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_shiftleftinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_logicalshiftrightinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_logicalshiftrightinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_logicalshiftrightinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_arithmeticshiftrightinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_arithmeticshiftrightinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_arithmeticshiftrightinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_andinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_andinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_andinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_orinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_orinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_orinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+</div>
+<div class="viewcode-block" id="IRVirtualMachine.visit_xorinstruction"><a class="viewcode-back" href="../../ir.html#ir.interpreter.IRVirtualMachine.visit_xorinstruction">[docs]</a>    <span class="k">def</span> <span class="nf">visit_xorinstruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s">&quot;IR Node not implemented: visit_</span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="n">__name__</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

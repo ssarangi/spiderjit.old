@@ -1,0 +1,362 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ir.function &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design_overall.html">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design_overall.html#overall-design">Overall Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code_documentation.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vm.html">vm package</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>ir.function</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for ir.function</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;sarangis&#39;</span>
+
+<span class="kn">from</span> <span class="nn">ir.exceptions</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">ir.instructions</span>
+<span class="kn">from</span> <span class="nn">ir.validator</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.value</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="Global"><a class="viewcode-back" href="../../ir.html#ir.function.Global">[docs]</a><span class="k">class</span> <span class="nc">Global</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">initializer</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__initializer</span> <span class="o">=</span> <span class="n">initializer</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initializer</span><span class="o">.</span><span class="n">type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">initializer</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__initializer</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;%&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">+</span> <span class="s">&quot; = &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__initializer</span><span class="p">)</span>
+ 
+    <span class="n">__repr__</span> <span class="o">=</span> <span class="n">__str__</span>
+</div>
+<div class="viewcode-block" id="NameGenerator"><a class="viewcode-back" href="../../ir.html#ir.function.NameGenerator">[docs]</a><span class="k">class</span> <span class="nc">NameGenerator</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__variable_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__named_variables</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">__get_variable_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">current_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__variable_idx</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__variable_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">current_idx</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__get_named_var_idx</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="n">new_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__named_variables</span><span class="p">:</span>
+            <span class="n">new_name</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__named_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__named_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__named_variables</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">return</span> <span class="n">new_name</span>
+
+    <span class="nd">@verify</span><span class="p">(</span><span class="n">inst</span><span class="o">=</span><span class="n">ir</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">Instruction</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">generate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">inst</span><span class="o">.</span><span class="n">name</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_variable_idx</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__get_named_var_idx</span><span class="p">(</span><span class="n">inst</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Function"><a class="viewcode-back" href="../../ir.html#ir.function.Function">[docs]</a><span class="k">class</span> <span class="nc">Function</span><span class="p">(</span><span class="n">Validator</span><span class="p">):</span>
+    <span class="nd">@verify</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="n">FunctionType</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ftype</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__basic_blocks</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;name is expected to be a string&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">name</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ftype</span><span class="p">,</span> <span class="n">FunctionType</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Function Type expected&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">__type</span> <span class="o">=</span> <span class="n">ftype</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">ftype</span><span class="o">.</span><span class="n">arg_types</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name_generator</span> <span class="o">=</span> <span class="n">NameGenerator</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name_generator</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name_generator</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">basic_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basic_blocks</span>
+
+    <span class="nd">@basic_blocks.setter</span>
+    <span class="k">def</span> <span class="nf">basic_blocks</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">block</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basic_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span>
+
+    <span class="nd">@args.setter</span>
+    <span class="k">def</span> <span class="nf">args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">arg_list</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Expected arg_list to be a list&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">verify_args</span><span class="p">(</span><span class="n">arg_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span> <span class="o">=</span> <span class="n">arg_list</span>
+
+    <span class="c"># @verify(arg=Argument)</span>
+    <span class="c"># def insert_arg(self, arg, idx = None):</span>
+    <span class="c">#     if idx &gt; len(self.__ftype.arg_types):</span>
+    <span class="c">#         raise InvalidUsageModel(&quot;Invalid argument type. Function supports %s arguments but argument to be &quot;</span>
+    <span class="c">#                                 &quot;added at index %s&quot; % (len(self.__ftype.arg_types), idx))</span>
+    <span class="c">#</span>
+    <span class="c">#     # Check the function type for the number of args</span>
+    <span class="c">#     arg_type_idx = -1</span>
+    <span class="c">#     if idx is None:</span>
+    <span class="c">#         # Check the length of the arguments.</span>
+    <span class="c">#         arg_type_idx = len(self.__arguments)</span>
+    <span class="c">#     else:</span>
+    <span class="c">#         arg_type_idx = idx</span>
+    <span class="c">#</span>
+    <span class="c">#     print(arg_type_idx)</span>
+    <span class="c">#     # Now check if the index we got has the same type as the one in function type</span>
+    <span class="c">#     arg_type = self.__ftype.arg_types[arg_type_idx]</span>
+    <span class="c">#     # Make sure that the arg has the same type as the arg type</span>
+    <span class="c">#     print(type(arg_type))</span>
+    <span class="c">#     print(type(arg.type))</span>
+    <span class="c">#     if not isinstance(arg.type, arg_type):</span>
+    <span class="c">#         raise InvalidTypeException(&quot;Argument: &quot; + str(arg) + &quot; Expected: &quot; + str(arg_type) + &quot; Received: &quot; + str(arg.type))</span>
+    <span class="c">#</span>
+    <span class="c">#     # Validate the arg</span>
+    <span class="c">#     if not isinstance(arg, Argument):</span>
+    <span class="c">#         raise InvalidTypeException(&quot;Argument type expected&quot;)</span>
+    <span class="c">#</span>
+    <span class="c">#     if idx is not None:</span>
+    <span class="c">#         # Check if the argument list is already that size</span>
+    <span class="c">#         if len(self.__arguments) &gt; idx:</span>
+    <span class="c">#             self.__arguments.insert(idx, arg)</span>
+    <span class="c">#         else:</span>
+    <span class="c">#             current_len = len(self.__arguments)</span>
+    <span class="c">#             self.__arguments.append(arg)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span>
+
+    <span class="nd">@name.setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">=</span> <span class="n">n</span>
+
+<div class="viewcode-block" id="Function.render_signature"><a class="viewcode-back" href="../../ir.html#ir.function.Function.render_signature">[docs]</a>    <span class="k">def</span> <span class="nf">render_signature</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output_str</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;define &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__ftype</span><span class="o">.</span><span class="n">ret_type</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">+</span> <span class="s">&quot;(&quot;</span>
+
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span><span class="p">):</span>
+            <span class="n">output_str</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;, &quot;</span>
+
+        <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;)&quot;</span>
+
+        <span class="k">return</span> <span class="n">output_str</span>
+</div>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">output_str</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+        <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;define &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="o">.</span><span class="n">ret_type</span><span class="p">)</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">__name</span> <span class="o">+</span> <span class="s">&quot;(&quot;</span>
+
+        <span class="k">for</span> <span class="n">count</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span><span class="p">):</span>
+            <span class="n">output_str</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__arguments</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;, &quot;</span>
+
+        <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;) {</span><span class="se">\n</span><span class="s">&quot;</span>
+
+        <span class="c"># render each basic block</span>
+        <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basic_blocks</span><span class="p">:</span>
+            <span class="n">output_str</span> <span class="o">+=</span> <span class="nb">str</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+
+        <span class="n">output_str</span> <span class="o">+=</span> <span class="s">&quot;}</span><span class="se">\n\n</span><span class="s">&quot;</span>
+        <span class="k">return</span> <span class="n">output_str</span>
+
+    <span class="nd">@verify</span><span class="p">(</span><span class="n">arg_list</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">verify_args</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg_list</span><span class="p">):</span>
+       <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">arg_list</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">type</span><span class="p">)</span> <span class="o">==</span>  <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="o">.</span><span class="n">arg_types</span><span class="p">[</span><span class="n">idx</span><span class="p">]):</span>
+                <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Expected </span><span class="si">%s</span><span class="s"> to be of type: </span><span class="si">%s</span><span class="s"> but received type: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span>
+                                           <span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__type</span><span class="o">.</span><span class="n">arg_types</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="nb">type</span><span class="p">(</span><span class="n">arg</span><span class="o">.</span><span class="n">type</span><span class="p">)))</span>
+
+<div class="viewcode-block" id="Function.validate"><a class="viewcode-back" href="../../ir.html#ir.function.Function.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">bb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__basic_blocks</span><span class="p">:</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+</div>
+    <span class="n">__repr__</span> <span class="o">=</span> <span class="n">__str__</span></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

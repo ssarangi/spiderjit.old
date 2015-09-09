@@ -1,0 +1,303 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>main &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="../index.html"/>
+        <link rel="up" title="Module code" href="index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../design_overall.html">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../design_overall.html#overall-design">Overall Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../code_documentation.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../vm.html">vm package</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="index.html">Module code</a> &raquo;</li>
+      
+    <li>main</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for main</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;sarangis&#39;</span>
+
+<span class="kn">from</span> <span class="nn">ir.module</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.context</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.irbuilder</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.constants</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimizer.passmanager</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">optimizer.basicpass</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pyjit.pretty_print</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pyjit.decorators</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">vm.vm</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.interpreter</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">pytests.fib</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">int32Ty</span> <span class="o">=</span> <span class="n">IntType</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+<span class="n">floatTy</span> <span class="o">=</span> <span class="n">FloatType</span><span class="p">()</span>
+
+<div class="viewcode-block" id="generate_ir"><a class="viewcode-back" href="../main.html#main.generate_ir">[docs]</a><span class="k">def</span> <span class="nf">generate_ir</span><span class="p">():</span>
+    <span class="n">ctx</span> <span class="o">=</span> <span class="n">Context</span><span class="p">()</span>
+    <span class="n">mod</span> <span class="o">=</span> <span class="n">Module</span><span class="p">(</span><span class="s">&quot;MyModule&quot;</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span>
+    <span class="n">irbuilder</span> <span class="o">=</span> <span class="n">IRBuilder</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span> <span class="n">ctx</span><span class="p">)</span>
+
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_global</span><span class="p">(</span><span class="s">&quot;first_global&quot;</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_global</span><span class="p">(</span><span class="s">&quot;second_global&quot;</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+
+    <span class="c"># Create the fibonacci function</span>
+    <span class="n">ft1</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_function_type</span><span class="p">(</span><span class="n">int32Ty</span><span class="p">,</span> <span class="n">int32Ty</span><span class="p">)</span>
+    <span class="n">irfib</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s">&quot;fib&quot;</span><span class="p">,</span> <span class="n">ft1</span><span class="p">)</span>
+    <span class="n">n_arg</span> <span class="o">=</span> <span class="n">Argument</span><span class="p">(</span><span class="n">int32Ty</span><span class="p">,</span> <span class="s">&quot;n&quot;</span><span class="p">)</span>
+    <span class="n">irfib</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="n">n_arg</span><span class="p">]</span>
+
+    <span class="n">entry_bb</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_basic_block</span><span class="p">(</span><span class="s">&quot;entry&quot;</span><span class="p">,</span> <span class="n">irfib</span><span class="p">)</span>
+    <span class="n">irfib</span><span class="o">.</span><span class="n">basic_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">entry_bb</span><span class="p">)</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">entry_bb</span><span class="p">)</span>
+    <span class="c"># Now add a icmp instruction</span>
+    <span class="n">icmp</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_icmp</span><span class="p">(</span><span class="n">n_arg</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">ifcont</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_basic_block</span><span class="p">(</span><span class="s">&quot;if-cont&quot;</span><span class="p">,</span> <span class="n">irfib</span><span class="p">)</span>
+    <span class="n">thenblock</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_basic_block</span><span class="p">(</span><span class="s">&quot;then&quot;</span><span class="p">,</span> <span class="n">irfib</span><span class="p">)</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_cond_branch</span><span class="p">(</span><span class="n">icmp</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="n">ifcont</span><span class="p">,</span> <span class="n">thenblock</span><span class="p">)</span>
+    <span class="n">irfib</span><span class="o">.</span><span class="n">basic_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ifcont</span><span class="p">)</span>
+    <span class="n">irfib</span><span class="o">.</span><span class="n">basic_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">thenblock</span><span class="p">)</span>
+
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">ifcont</span><span class="p">)</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_return</span><span class="p">(</span><span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">thenblock</span><span class="p">)</span>
+    <span class="n">n_minus_1</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_sub</span><span class="p">(</span><span class="n">n_arg</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">n_minus_2</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_sub</span><span class="p">(</span><span class="n">n_arg</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">call1</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_call</span><span class="p">(</span><span class="n">irfib</span><span class="p">,</span> <span class="n">n_minus_1</span><span class="p">)</span>
+    <span class="n">call2</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_call</span><span class="p">(</span><span class="n">irfib</span><span class="p">,</span> <span class="n">n_minus_2</span><span class="p">)</span>
+    <span class="n">final_res</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_add</span><span class="p">(</span><span class="n">call1</span><span class="p">,</span> <span class="n">call2</span><span class="p">)</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_return</span><span class="p">(</span><span class="n">final_res</span><span class="p">)</span>
+
+    <span class="c"># Create the main entry point</span>
+    <span class="n">ft</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_function_type</span><span class="p">(</span><span class="n">int32Ty</span><span class="p">)</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_function</span><span class="p">(</span><span class="s">&quot;main&quot;</span><span class="p">,</span> <span class="n">ft</span><span class="p">)</span>
+    <span class="n">bb</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_basic_block</span><span class="p">(</span><span class="s">&quot;entry&quot;</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">basic_blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">insert_after</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+    <span class="n">call_fib</span> <span class="o">=</span> <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_call</span><span class="p">(</span><span class="n">irfib</span><span class="p">,</span> <span class="n">IntConstant</span><span class="p">(</span><span class="mi">32</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+    <span class="n">irbuilder</span><span class="o">.</span><span class="n">create_return</span><span class="p">(</span><span class="n">call_fib</span><span class="p">)</span>
+
+    <span class="n">mod</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+    <span class="n">mod</span><span class="o">.</span><span class="n">functions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">irfib</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">100</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+    <span class="n">mod</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span>
+
+    <span class="n">mod</span><span class="o">.</span><span class="n">entry_point</span> <span class="o">=</span> <span class="n">f</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Running Passmanager:&quot;</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="n">passmgr</span> <span class="o">=</span> <span class="n">PassManager</span><span class="p">()</span>
+    <span class="n">passmgr</span><span class="o">.</span><span class="n">add_module_pass</span><span class="p">(</span><span class="n">PrintFunctionsPass</span><span class="p">())</span>
+    <span class="n">passmgr</span><span class="o">.</span><span class="n">add_function_pass</span><span class="p">(</span><span class="n">PrintBasicBlocksPass</span><span class="p">())</span>
+    <span class="n">passmgr</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;-&quot;</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">&quot;Running IR Virtual machine&quot;</span><span class="p">)</span>
+    <span class="n">irvm</span> <span class="o">=</span> <span class="n">IRVirtualMachine</span><span class="p">()</span>
+    <span class="n">irvm</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">mod</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">irvm</span><span class="o">.</span><span class="n">eval_result</span><span class="p">)</span>
+
+<span class="c"># @autojit</span>
+<span class="c"># def addup(n):</span>
+<span class="c">#     x = 1</span>
+<span class="c">#     for i in range(n):</span>
+<span class="c">#         n += 1 + x</span>
+<span class="c">#     return n</span>
+
+<span class="c">#@autojit</span>
+<span class="c">#def add(a, b):</span>
+<span class="c">#    c = a + b</span>
+<span class="c">#    return c</span>
+
+<span class="c"># @autojit</span>
+<span class="c"># def addone(a):</span>
+<span class="c">#     return a + 1</span>
+
+<span class="c">#@autojit</span>
+<span class="c">#def addstring(one, two):</span>
+<span class="c">#    two = two + &quot;testx&quot;</span>
+<span class="c">#    return &quot;hello&quot; + one + two</span>
+
+<span class="c"># @autojit</span>
+<span class="c"># def test_conditional():</span>
+<span class="c">#     var = 1</span>
+<span class="c">#     if var &lt;= 2:</span>
+<span class="c">#         var = []</span>
+<span class="c">#     elif var == 3:</span>
+<span class="c">#         var = {}</span>
+<span class="c">#     else:</span>
+<span class="c">#         var = &#39;hi&#39;</span>
+</div>
+<div class="viewcode-block" id="test_bytecode_vm"><a class="viewcode-back" href="../main.html#main.test_bytecode_vm">[docs]</a><span class="k">def</span> <span class="nf">test_bytecode_vm</span><span class="p">():</span>
+    <span class="n">dis</span><span class="o">.</span><span class="n">dis</span><span class="p">(</span><span class="n">fib</span><span class="o">.</span><span class="n">__code__</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+        <span class="n">vm</span> <span class="o">=</span> <span class="n">BytecodeVM</span><span class="p">(</span><span class="n">fib</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+        <span class="n">vm</span><span class="o">.</span><span class="n">execute</span><span class="p">()</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">&quot;fib(&quot;</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="s">&quot;) =&quot;</span><span class="p">,</span> <span class="n">fib</span><span class="p">(</span><span class="n">n</span><span class="p">),</span> <span class="s">&quot; = &quot;</span><span class="p">,</span> <span class="n">vm</span><span class="o">.</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c">#vm = BytecodeVM(fib, 3)</span>
+    <span class="c">#vm.execute()</span>
+    <span class="c">#print(vm.value)</span>
+</div>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="c"># generate_ir()</span>
+    <span class="n">test_bytecode_vm</span><span class="p">()</span>
+    <span class="n">generate_ir</span><span class="p">()</span>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../_static/jquery.js"></script>
+      <script type="text/javascript" src="../_static/underscore.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,342 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>ir.irbuilder &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="../../index.html"/>
+        <link rel="up" title="Module code" href="../index.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="../../index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../design_overall.html">Spider JIT</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../design_overall.html#overall-design">Overall Design</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../code_documentation.html">Code Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../ir.html">ir package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../main.html">main module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../optimizer.html">optimizer package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pyjit.html">pyjit package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../utils.html">utils package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../vm.html">vm package</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../../index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../../index.html">Docs</a> &raquo;</li>
+      
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      
+    <li>ir.irbuilder</li>
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <h1>Source code for ir.irbuilder</h1><div class="highlight"><pre>
+<span class="n">__author__</span> <span class="o">=</span> <span class="s">&#39;sarangis&#39;</span>
+
+<span class="kn">from</span> <span class="nn">ir.types</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.function</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.context</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.module</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">ir.instructions</span> <span class="kn">import</span> <span class="o">*</span>
+
+<div class="viewcode-block" id="IRBuilder"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder">[docs]</a><span class="k">class</span> <span class="nc">IRBuilder</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; The main builder to be used for creating instructions. This has to be used to insert / create / modify instructions</span>
+<span class="sd">        This class will have to support all the other class creating it.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">current_module</span> <span class="o">=</span> <span class="bp">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__module</span> <span class="o">=</span> <span class="n">current_module</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="bp">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__orphaned_instructions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__context</span> <span class="o">=</span> <span class="n">context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span> <span class="o">=</span> <span class="bp">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__module</span>
+
+    <span class="nd">@module.setter</span>
+    <span class="k">def</span> <span class="nf">module</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mod</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__module</span> <span class="o">=</span> <span class="n">mod</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__context</span>
+
+    <span class="nd">@context.setter</span>
+    <span class="k">def</span> <span class="nf">context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ctx</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__context</span> <span class="o">=</span> <span class="n">ctx</span>
+
+<div class="viewcode-block" id="IRBuilder.insert_after"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.insert_after">[docs]</a>    <span class="k">def</span> <span class="nf">insert_after</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">BasicBlock</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">ip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span> <span class="o">=</span> <span class="n">ip</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">Instruction</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">ip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="n">ip</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">find_instruction_idx</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidInstructionException</span><span class="p">(</span><span class="s">&quot;Count not find instruction in its parent basic block&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Expected either Basic Block or Instruction&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.insert_before"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.insert_before">[docs]</a>    <span class="k">def</span> <span class="nf">insert_before</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ip</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">BasicBlock</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">ip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span> <span class="o">=</span> <span class="n">ip</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ip</span><span class="p">,</span> <span class="n">Instruction</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">ip</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="n">ip</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">find_instruction_idx</span><span class="p">(</span><span class="n">ip</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">==</span> <span class="bp">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">InvalidInstructionException</span><span class="p">(</span><span class="s">&quot;Count not find instruction in its parent basic block&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">-=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Expected either Basic Block or Instruction&quot;</span><span class="p">)</span>
+</div>
+    <span class="k">def</span> <span class="nf">__add_instruction</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inst</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="c"># This is an orphaned instruction</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__orphaned_instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span><span class="p">,</span> <span class="n">BasicBlock</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">inst</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">inst</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span><span class="p">,</span> <span class="n">Instruction</span><span class="p">):</span>
+            <span class="n">bb</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span><span class="o">.</span><span class="n">parent</span>
+            <span class="n">bb</span><span class="o">.</span><span class="n">instructions</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inst</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point_idx</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">__insertion_point</span> <span class="o">=</span> <span class="n">inst</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;Could not add instruction&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="IRBuilder.create_function_type"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_function_type">[docs]</a>    <span class="k">def</span> <span class="nf">create_function_type</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ret_ty</span><span class="p">,</span> <span class="o">*</span><span class="n">arg_tys</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FunctionType</span><span class="p">(</span><span class="n">ret_ty</span><span class="p">,</span> <span class="o">*</span><span class="n">arg_tys</span><span class="p">)</span>
+</div>
+    <span class="nd">@verify</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">ftype</span><span class="o">=</span><span class="n">FunctionType</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">create_function</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">ftype</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">Function</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">ftype</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+<div class="viewcode-block" id="IRBuilder.set_entry_point"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.set_entry_point">[docs]</a>    <span class="k">def</span> <span class="nf">set_entry_point</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">function</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__module</span><span class="o">.</span><span class="n">entry_point</span> <span class="o">=</span> <span class="n">function</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_global"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_global">[docs]</a>    <span class="k">def</span> <span class="nf">create_global</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">initializer</span><span class="p">):</span>
+        <span class="n">g</span> <span class="o">=</span> <span class="n">Global</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">initializer</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__module</span><span class="o">.</span><span class="n">add_global</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_basic_block"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_basic_block">[docs]</a>    <span class="k">def</span> <span class="nf">create_basic_block</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="p">):</span>
+        <span class="n">bb</span> <span class="o">=</span> <span class="n">BasicBlock</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">parent</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">bb</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_return"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_return">[docs]</a>    <span class="k">def</span> <span class="nf">create_return</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">ret_inst</span> <span class="o">=</span> <span class="n">ReturnInstruction</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">ret_inst</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_branch"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_branch">[docs]</a>    <span class="k">def</span> <span class="nf">create_branch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bb</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bb</span><span class="p">,</span> <span class="n">BasicBlock</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="n">InvalidTypeException</span><span class="p">(</span><span class="s">&quot;Expected a Basic Block&quot;</span><span class="p">)</span>
+
+        <span class="n">branch_inst</span> <span class="o">=</span> <span class="n">BranchInstruction</span><span class="p">(</span><span class="n">bb</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">branch_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">branch_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_cond_branch"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_cond_branch">[docs]</a>    <span class="k">def</span> <span class="nf">create_cond_branch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmp_inst</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">bb_true</span><span class="p">,</span> <span class="n">bb_false</span><span class="p">):</span>
+        <span class="n">cond_branch</span> <span class="o">=</span> <span class="n">ConditionalBranchInstruction</span><span class="p">(</span><span class="n">cmp_inst</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">bb_true</span><span class="p">,</span> <span class="n">bb_false</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">cond_branch</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">cond_branch</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_call"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_call">[docs]</a>    <span class="k">def</span> <span class="nf">create_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">func</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">call_inst</span> <span class="o">=</span> <span class="n">CallInstruction</span><span class="p">(</span><span class="n">func</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">call_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">call_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_add"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_add">[docs]</a>    <span class="k">def</span> <span class="nf">create_add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">add_inst</span> <span class="o">=</span> <span class="n">AddInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">add_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">add_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_sub"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_sub">[docs]</a>    <span class="k">def</span> <span class="nf">create_sub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">sub_inst</span> <span class="o">=</span> <span class="n">SubInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">sub_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">sub_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_mul"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_mul">[docs]</a>    <span class="k">def</span> <span class="nf">create_mul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">mul_inst</span> <span class="o">=</span> <span class="n">MulInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">mul_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">mul_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_div"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_div">[docs]</a>    <span class="k">def</span> <span class="nf">create_div</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">div_inst</span> <span class="o">=</span> <span class="n">DivInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">div_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">div_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_fadd"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_fadd">[docs]</a>    <span class="k">def</span> <span class="nf">create_fadd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fadd_inst</span> <span class="o">=</span> <span class="n">FAddInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">fadd_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fadd_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_fsub"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_fsub">[docs]</a>    <span class="k">def</span> <span class="nf">create_fsub</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fsub_inst</span> <span class="o">=</span> <span class="n">FSubInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">fsub_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fsub_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_fmul"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_fmul">[docs]</a>    <span class="k">def</span> <span class="nf">create_fmul</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fmul_inst</span> <span class="o">=</span> <span class="n">FMulInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">fmul_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fmul_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_fdiv"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_fdiv">[docs]</a>    <span class="k">def</span> <span class="nf">create_fdiv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">fdiv_inst</span> <span class="o">=</span> <span class="n">FDivInstruction</span><span class="p">(</span><span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">fdiv_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">fdiv_inst</span>
+</div>
+<div class="viewcode-block" id="IRBuilder.create_icmp"><a class="viewcode-back" href="../../ir.html#ir.irbuilder.IRBuilder.create_icmp">[docs]</a>    <span class="k">def</span> <span class="nf">create_icmp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="n">icmp_inst</span> <span class="o">=</span> <span class="n">ICmpInstruction</span><span class="p">(</span><span class="n">CompareTypes</span><span class="o">.</span><span class="n">SLE</span><span class="p">,</span> <span class="n">lhs</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">__current_bb</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">__add_instruction</span><span class="p">(</span><span class="n">icmp_inst</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">icmp_inst</span></div></div>
+</pre></div>
+
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'../../',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="../../_static/jquery.js"></script>
+      <script type="text/javascript" src="../../_static/underscore.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

@@ -1,0 +1,903 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>vm package &mdash; SpiderJIT 0.1 documentation</title>
+  
+
+  
+  
+
+  
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700,400italic,700italic|Roboto+Slab:400,700|Inconsolata:400,700&subset=latin,cyrillic' rel='stylesheet' type='text/css'>
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="SpiderJIT 0.1 documentation" href="index.html"/>
+        <link rel="prev" title="utils package" href="utils.html"/> 
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.6.2/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-nav-search">
+        
+          <a href="index.html" class="fa fa-home"> SpiderJIT</a>
+        
+        
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+        
+          
+          
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="ir.html">ir package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.base_ir_visitor">ir.base_ir_visitor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.codegen">ir.codegen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.constants">ir.constants module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.context">ir.context module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.exceptions">ir.exceptions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.function">ir.function module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.instructions">ir.instructions module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.interpreter">ir.interpreter module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.irbuilder">ir.irbuilder module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.module">ir.module module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.types">ir.types module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.utils">ir.utils module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.validator">ir.validator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir.value">ir.value module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ir.html#module-ir">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="main.html">main module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimizer.html">optimizer package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.basicpass">optimizer.basicpass module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.pass_support">optimizer.pass_support module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer.passmanager">optimizer.passmanager module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html#module-optimizer">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pyjit.html">pyjit package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.codegen">pyjit.codegen module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.decorators">pyjit.decorators module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.nodes">pyjit.nodes module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.pretty_print">pyjit.pretty_print module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.type_infer">pyjit.type_infer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit.visitors">pyjit.visitors module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyjit.html#module-pyjit">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="utils.html">utils package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils.base_visitor">utils.base_visitor module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html#module-utils">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">vm package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-vm.vm">vm.vm module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-vm">Module contents</a></li>
+</ul>
+</li>
+</ul>
+
+          
+        
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">SpiderJIT</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>vm package</li>
+      <li class="wy-breadcrumbs-aside">
+        
+          <a href="_sources/vm.txt" rel="nofollow"> View page source</a>
+        
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document">
+            
+  <div class="section" id="vm-package">
+<h1>vm package<a class="headerlink" href="#vm-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-vm.vm">
+<span id="vm-vm-module"></span><h2>vm.vm module<a class="headerlink" href="#module-vm.vm" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="vm.vm.BytecodeVM">
+<em class="property">class </em><code class="descclassname">vm.vm.</code><code class="descname">BytecodeVM</code><span class="sig-paren">(</span><em>fn</em>, <em>*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute">
+<code class="descname">execute</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_ADD">
+<code class="descname">execute_BINARY_ADD</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_ADD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_ADD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 + TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_AND">
+<code class="descname">execute_BINARY_AND</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_AND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_AND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 &amp; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_FLOOR_DIVIDE">
+<code class="descname">execute_BINARY_FLOOR_DIVIDE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_FLOOR_DIVIDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_FLOOR_DIVIDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 // TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_LSHIFT">
+<code class="descname">execute_BINARY_LSHIFT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_LSHIFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_LSHIFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 &lt;&lt; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_MODULO">
+<code class="descname">execute_BINARY_MODULO</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_MODULO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_MODULO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 % TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_MULTIPLY">
+<code class="descname">execute_BINARY_MULTIPLY</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_MULTIPLY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_MULTIPLY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 * TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_OR">
+<code class="descname">execute_BINARY_OR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_OR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_OR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 | TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_POWER">
+<code class="descname">execute_BINARY_POWER</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_POWER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_POWER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 ** TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_RSHIFT">
+<code class="descname">execute_BINARY_RSHIFT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_RSHIFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_RSHIFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 &gt;&gt; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_SUBSCR">
+<code class="descname">execute_BINARY_SUBSCR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_SUBSCR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_SUBSCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1[TOS].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_SUBTRACT">
+<code class="descname">execute_BINARY_SUBTRACT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_SUBTRACT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_SUBTRACT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 - TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_TRUE_DIVIDE">
+<code class="descname">execute_BINARY_TRUE_DIVIDE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_TRUE_DIVIDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_TRUE_DIVIDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 / TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BINARY_XOR">
+<code class="descname">execute_BINARY_XOR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BINARY_XOR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BINARY_XOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = TOS1 ^ TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BREAK_LOOP">
+<code class="descname">execute_BREAK_LOOP</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BREAK_LOOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BREAK_LOOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminates a loop due to a break statement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BUILD_LIST">
+<code class="descname">execute_BUILD_LIST</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BUILD_LIST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BUILD_LIST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works as BUILD_TUPLE, but creates a list.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BUILD_MAP">
+<code class="descname">execute_BUILD_MAP</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BUILD_MAP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BUILD_MAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a new dictionary object onto the stack. The dictionary is pre-sized to hold count entries.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BUILD_SET">
+<code class="descname">execute_BUILD_SET</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BUILD_SET"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BUILD_SET" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works as BUILD_TUPLE, but creates a set.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BUILD_SLICE">
+<code class="descname">execute_BUILD_SLICE</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BUILD_SLICE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BUILD_SLICE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a slice object on the stack. argc must be 2 or 3. If it is 2, slice(TOS1, TOS) is pushed; if it is 3, slice(TOS2, TOS1, TOS)
+is pushed. See the slice() built-in function for more information.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_BUILD_TUPLE">
+<code class="descname">execute_BUILD_TUPLE</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_BUILD_TUPLE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_BUILD_TUPLE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a tuple consuming count items from the stack, and pushes the resulting tuple onto the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_CALL_FUNCTION">
+<code class="descname">execute_CALL_FUNCTION</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_CALL_FUNCTION"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_CALL_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls a function. The low byte of argc indicates the number of positional parameters, the high byte the number of keyword
+parameters. On the stack, the opcode finds the keyword parameters first. For each keyword argument, the value is on top of
+the key. Below the keyword parameters, the positional parameters are on the stack, with the right-most parameter on top. 
+Below the parameters, the function object to call is on the stack. Pops all function arguments, and the function itself off
+the stack, and pushes the return value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_CALL_FUNCTION_KW">
+<code class="descname">execute_CALL_FUNCTION_KW</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_CALL_FUNCTION_KW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_CALL_FUNCTION_KW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,
+followed by explicit keyword and positional arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR">
+<code class="descname">execute_CALL_FUNCTION_VAR</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_CALL_FUNCTION_VAR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the variable argument list,
+followed by keyword and positional arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR_KW">
+<code class="descname">execute_CALL_FUNCTION_VAR_KW</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_CALL_FUNCTION_VAR_KW"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_CALL_FUNCTION_VAR_KW" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls a function. argc is interpreted as in CALL_FUNCTION. The top element on the stack contains the keyword arguments dictionary,
+followed by the variable-arguments tuple, followed by explicit keyword and positional arguments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_COMPARE_OP">
+<code class="descname">execute_COMPARE_OP</code><span class="sig-paren">(</span><em>compare_op</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_COMPARE_OP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_COMPARE_OP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Performs a Boolean operation. The operation name can be found in cmp_op[opname].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_CONTINUE_LOOP">
+<code class="descname">execute_CONTINUE_LOOP</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_CONTINUE_LOOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_CONTINUE_LOOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Continues a loop due to a continue statement. target is the address to jump to (which should be
+a FOR_ITER instruction).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_ATTR">
+<code class="descname">execute_DELETE_ATTR</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_ATTR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_ATTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements del TOS.name, using namei as index into co_names.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_DEREF">
+<code class="descname">execute_DELETE_DEREF</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_DEREF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_DEREF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Empties the cell contained in slot i of the cell and free variable storage. Used by the del statement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_FAST">
+<code class="descname">execute_DELETE_FAST</code><span class="sig-paren">(</span><em>var_num</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_FAST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_FAST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Deletes local co_varnames[var_num].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_GLOBAL">
+<code class="descname">execute_DELETE_GLOBAL</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_GLOBAL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_GLOBAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works as DELETE_NAME, but deletes a global name.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_NAME">
+<code class="descname">execute_DELETE_NAME</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_NAME"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements del name, where namei is the index into co_names attribute of the code object.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DELETE_SUBSCR">
+<code class="descname">execute_DELETE_SUBSCR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DELETE_SUBSCR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DELETE_SUBSCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements del TOS1[TOS].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DUP_TOP">
+<code class="descname">execute_DUP_TOP</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DUP_TOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DUP_TOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duplicates the reference on top of the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_DUP_TOP_TWO">
+<code class="descname">execute_DUP_TOP_TWO</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_DUP_TOP_TWO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_DUP_TOP_TWO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Duplicates the two references on top of the stack, leaving them in the same order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_END_FINALLY">
+<code class="descname">execute_END_FINALLY</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_END_FINALLY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_END_FINALLY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Terminates a finally clause. The interpreter recalls whether the exception has to be re-raised, or whether
+the function returns, and continues with the outer-next block.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_EXTENDED_ARG">
+<code class="descname">execute_EXTENDED_ARG</code><span class="sig-paren">(</span><em>ext</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_EXTENDED_ARG"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_EXTENDED_ARG" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prefixes any opcode which has an argument too big to fit into the default two bytes. ext holds two additional bytes which, taken
+together with the subsequent opcode’s argument, comprise a four-byte argument, ext being the two most-significant bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_FOR_ITER">
+<code class="descname">execute_FOR_ITER</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_FOR_ITER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_FOR_ITER" title="Permalink to this definition">¶</a></dt>
+<dd><p>TOS is an iterator. Call its __next__() method. If this yields a new value, push it on the stack (leaving the iterator below it).
+If the iterator indicates it is exhausted TOS is popped, and the byte code counter is incremented by delta.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_GET_ITER">
+<code class="descname">execute_GET_ITER</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_GET_ITER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_GET_ITER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = iter(TOS).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_IMPORT_FROM">
+<code class="descname">execute_IMPORT_FROM</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_IMPORT_FROM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_IMPORT_FROM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the attribute co_names[namei] from the module found in TOS. The resulting object is pushed onto the stack,
+to be subsequently stored by a STORE_FAST instruction.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_IMPORT_NAME">
+<code class="descname">execute_IMPORT_NAME</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_IMPORT_NAME"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_IMPORT_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Imports the module co_names[namei]. TOS and TOS1 are popped and provide the fromlist and level arguments of __import__().
+The module object is pushed onto the stack. The current namespace is not affected: for a proper import statement, a subsequent
+STORE_FAST instruction modifies the namespace.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_IMPORT_STAR">
+<code class="descname">execute_IMPORT_STAR</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_IMPORT_STAR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_IMPORT_STAR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads all symbols not starting with &#8216;_&#8217; directly from the module TOS to the local namespace.
+The module is popped after loading all names. This opcode implements from module import <a href="#id1"><span class="problematic" id="id2">*</span></a>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_ADD">
+<code class="descname">execute_INPLACE_ADD</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_ADD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_ADD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 + TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_AND">
+<code class="descname">execute_INPLACE_AND</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_AND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_AND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 &amp; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_FLOOR_DIVIDE">
+<code class="descname">execute_INPLACE_FLOOR_DIVIDE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_FLOOR_DIVIDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_FLOOR_DIVIDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 // TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_LSHIFT">
+<code class="descname">execute_INPLACE_LSHIFT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_LSHIFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_LSHIFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 &lt;&lt; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_MODULO">
+<code class="descname">execute_INPLACE_MODULO</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_MODULO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_MODULO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 % TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_MULTIPLY">
+<code class="descname">execute_INPLACE_MULTIPLY</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_MULTIPLY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_MULTIPLY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 * TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_OR">
+<code class="descname">execute_INPLACE_OR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_OR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_OR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 | TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_POWER">
+<code class="descname">execute_INPLACE_POWER</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_POWER"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_POWER" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 ** TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_RSHIFT">
+<code class="descname">execute_INPLACE_RSHIFT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_RSHIFT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_RSHIFT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 &gt;&gt; TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_SUBTRACT">
+<code class="descname">execute_INPLACE_SUBTRACT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_SUBTRACT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_SUBTRACT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 - TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_TRUE_DIVIDE">
+<code class="descname">execute_INPLACE_TRUE_DIVIDE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_TRUE_DIVIDE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_TRUE_DIVIDE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 / TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_INPLACE_XOR">
+<code class="descname">execute_INPLACE_XOR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_INPLACE_XOR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_INPLACE_XOR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements in-place TOS = TOS1 ^ TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_JUMP_ABSOLUTE">
+<code class="descname">execute_JUMP_ABSOLUTE</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_JUMP_ABSOLUTE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_JUMP_ABSOLUTE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set bytecode counter to target.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_JUMP_FORWARD">
+<code class="descname">execute_JUMP_FORWARD</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_JUMP_FORWARD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_JUMP_FORWARD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Increments bytecode counter by delta.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_JUMP_IF_FALSE_OR_POP">
+<code class="descname">execute_JUMP_IF_FALSE_OR_POP</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_JUMP_IF_FALSE_OR_POP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_JUMP_IF_FALSE_OR_POP" title="Permalink to this definition">¶</a></dt>
+<dd><p>If TOS is false, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is true), TOS is popped.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_JUMP_IF_TRUE_OR_POP">
+<code class="descname">execute_JUMP_IF_TRUE_OR_POP</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_JUMP_IF_TRUE_OR_POP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_JUMP_IF_TRUE_OR_POP" title="Permalink to this definition">¶</a></dt>
+<dd><p>If TOS is true, sets the bytecode counter to target and leaves TOS on the stack. Otherwise (TOS is false), TOS is popped.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LIST_APPEND">
+<code class="descname">execute_LIST_APPEND</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LIST_APPEND"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LIST_APPEND" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls list.append(TOS[-i], TOS). Used to implement list comprehensions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_ATTR">
+<code class="descname">execute_LOAD_ATTR</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_ATTR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_ATTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Replaces TOS with getattr(TOS, co_names[namei]).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_BUILD_CLASS">
+<code class="descname">execute_LOAD_BUILD_CLASS</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_BUILD_CLASS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_BUILD_CLASS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes builtins.__build_class__() onto the stack. It is later called by CALL_FUNCTION to construct a class.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_CLASSDEREF">
+<code class="descname">execute_LOAD_CLASSDEREF</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_CLASSDEREF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_CLASSDEREF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Much like LOAD_DEREF but first checks the locals dictionary before consulting the cell. This is used for loading free
+variables in class bodies.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_CLOSURE">
+<code class="descname">execute_LOAD_CLOSURE</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_CLOSURE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_CLOSURE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a reference to the cell contained in slot i of the cell and free variable storage. The name of the variable is
+co_cellvars[i] if i is less than the length of co_cellvars. Otherwise it is co_freevars[i - len(co_cellvars)].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_CONST">
+<code class="descname">execute_LOAD_CONST</code><span class="sig-paren">(</span><em>consti</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_CONST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_CONST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes co_consts[consti] onto the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_DEREF">
+<code class="descname">execute_LOAD_DEREF</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_DEREF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_DEREF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the cell contained in slot i of the cell and free variable storage. Pushes a reference to the object the cell
+contains on the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_FAST">
+<code class="descname">execute_LOAD_FAST</code><span class="sig-paren">(</span><em>var_num</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_FAST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_FAST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a reference to the local co_varnames[var_num] onto the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_GLOBAL">
+<code class="descname">execute_LOAD_GLOBAL</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_GLOBAL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_GLOBAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loads the global named co_names[namei] onto the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_LOAD_NAME">
+<code class="descname">execute_LOAD_NAME</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_LOAD_NAME"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_LOAD_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes the value associated with co_names[namei] onto the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_MAKE_CLOSURE">
+<code class="descname">execute_MAKE_CLOSURE</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_MAKE_CLOSURE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_MAKE_CLOSURE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a new function object, sets its __closure__ slot, and pushes it on the stack. TOS is the qualified name of the function,
+TOS1 is the code associated with the function, and TOS2 is the tuple containing cells for the closure’s free variables. argc is
+interpreted as in MAKE_FUNCTION; the annotations and defaults are also in the same order below TOS2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_MAKE_FUNCTION">
+<code class="descname">execute_MAKE_FUNCTION</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_MAKE_FUNCTION"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_MAKE_FUNCTION" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a new function object on the stack. From bottom to top, the consumed stack must consist of argc &amp; 0xFF default argument
+objects in positional order (argc &gt;&gt; 8) &amp; 0xFF pairs of name and default argument, with the name just below the object on the
+stack, for keyword-only parameters (argc &gt;&gt; 16) &amp; 0x7FFF parameter annotation objects a tuple listing the parameter names for the
+annotations (only if there are ony annotation objects) the code associated with the function (at TOS1) the qualified name of the
+function (at TOS)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_MAP_ADD">
+<code class="descname">execute_MAP_ADD</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_MAP_ADD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_MAP_ADD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls dict.setitem(TOS1[-i], TOS, TOS1). Used to implement dict comprehensions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_NOP">
+<code class="descname">execute_NOP</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_NOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_NOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Do nothing code. Used as a placeholder by the bytecode optimizer.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_POP_BLOCK">
+<code class="descname">execute_POP_BLOCK</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_POP_BLOCK"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_POP_BLOCK" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes one block from the block stack. Per frame, there is a stack of blocks, denoting nested loops,
+try statements, and such.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_POP_EXCEPT">
+<code class="descname">execute_POP_EXCEPT</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_POP_EXCEPT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_POP_EXCEPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes one block from the block stack. The popped block must be an exception handler block, as implicitly
+created when entering an except handler. In addition to popping extraneous values from the frame stack,
+the last three popped values are used to restore the exception state.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_POP_JUMP_IF_FALSE">
+<code class="descname">execute_POP_JUMP_IF_FALSE</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_POP_JUMP_IF_FALSE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_POP_JUMP_IF_FALSE" title="Permalink to this definition">¶</a></dt>
+<dd><p>If TOS is false, sets the bytecode counter to target. TOS is popped.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_POP_JUMP_IF_TRUE">
+<code class="descname">execute_POP_JUMP_IF_TRUE</code><span class="sig-paren">(</span><em>target</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_POP_JUMP_IF_TRUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_POP_JUMP_IF_TRUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>If TOS is true, sets the bytecode counter to target. TOS is popped.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_POP_TOP">
+<code class="descname">execute_POP_TOP</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_POP_TOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_POP_TOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Removes the top-of-stack (TOS) item.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_PRINT_EXPR">
+<code class="descname">execute_PRINT_EXPR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_PRINT_EXPR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_PRINT_EXPR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements the expression statement for the interactive mode. TOS is removed from the
+stack and printed. In non-interactive mode, an expression statement is terminated with POP_TOP.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_RAISE_VARARGS">
+<code class="descname">execute_RAISE_VARARGS</code><span class="sig-paren">(</span><em>argc</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_RAISE_VARARGS"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_RAISE_VARARGS" title="Permalink to this definition">¶</a></dt>
+<dd><p>Raises an exception. argc indicates the number of parameters to the raise statement, ranging from 0 to 3. The handler will
+find the traceback as TOS2, the parameter as TOS1, and the exception as TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_RETURN_VALUE">
+<code class="descname">execute_RETURN_VALUE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_RETURN_VALUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_RETURN_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns with TOS to the caller of the function.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_ROT_THREE">
+<code class="descname">execute_ROT_THREE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_ROT_THREE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_ROT_THREE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Lifts second and third stack item one position up, moves top down to position three.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_ROT_TWO">
+<code class="descname">execute_ROT_TWO</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_ROT_TWO"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_ROT_TWO" title="Permalink to this definition">¶</a></dt>
+<dd><p>Swaps the two top-most stack items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_SETUP_EXCEPT">
+<code class="descname">execute_SETUP_EXCEPT</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_SETUP_EXCEPT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_SETUP_EXCEPT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a try block from a try-except clause onto the block stack. delta points to the first except block.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_SETUP_FINALLY">
+<code class="descname">execute_SETUP_FINALLY</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_SETUP_FINALLY"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_SETUP_FINALLY" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a try block from a try-except clause onto the block stack. delta points to the finally block.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_SETUP_LOOP">
+<code class="descname">execute_SETUP_LOOP</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_SETUP_LOOP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_SETUP_LOOP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pushes a block for a loop onto the block stack. The block spans from the current instruction with a size of delta bytes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_SETUP_WITH">
+<code class="descname">execute_SETUP_WITH</code><span class="sig-paren">(</span><em>delta</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_SETUP_WITH"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_SETUP_WITH" title="Permalink to this definition">¶</a></dt>
+<dd><p>This opcode performs several operations before a with block starts. First, it loads __exit__() from the 
+context manager and pushes it onto the stack for later use by WITH_CLEANUP. Then, __enter__() is called, and
+a finally block pointing to delta is pushed. Finally, the result of calling the enter method is pushed onto the
+stack. The next opcode will either ignore it (POP_TOP), or store it in (a) variable(s) (STORE_FAST, STORE_NAME,
+or UNPACK_SEQUENCE).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_SET_ADD">
+<code class="descname">execute_SET_ADD</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_SET_ADD"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_SET_ADD" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calls set.add(TOS1[-i], TOS). Used to implement set comprehensions.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_ATTR">
+<code class="descname">execute_STORE_ATTR</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_ATTR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_ATTR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS.name = TOS1, where namei is the index of name in co_names.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_DEREF">
+<code class="descname">execute_STORE_DEREF</code><span class="sig-paren">(</span><em>i</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_DEREF"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_DEREF" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores TOS into the cell contained in slot i of the cell and free variable storage.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_FAST">
+<code class="descname">execute_STORE_FAST</code><span class="sig-paren">(</span><em>var_num</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_FAST"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_FAST" title="Permalink to this definition">¶</a></dt>
+<dd><p>Stores TOS into the local co_varnames[var_num].</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_GLOBAL">
+<code class="descname">execute_STORE_GLOBAL</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_GLOBAL"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_GLOBAL" title="Permalink to this definition">¶</a></dt>
+<dd><p>Works as STORE_NAME, but stores the name as a global.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_MAP">
+<code class="descname">execute_STORE_MAP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_MAP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_MAP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Store a key and value pair in a dictionary. Pops the key and value while leaving the dictionary on the stack.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_NAME">
+<code class="descname">execute_STORE_NAME</code><span class="sig-paren">(</span><em>namei</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_NAME"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_NAME" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements name = TOS. namei is the index of name in the attribute co_names of the code object. The compiler tries
+to use STORE_FAST or STORE_GLOBAL if possible.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_STORE_SUBSCR">
+<code class="descname">execute_STORE_SUBSCR</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_STORE_SUBSCR"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_STORE_SUBSCR" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS1[TOS] = TOS2.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNARY_INVERT">
+<code class="descname">execute_UNARY_INVERT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNARY_INVERT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNARY_INVERT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = ~TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNARY_NEGATIVE">
+<code class="descname">execute_UNARY_NEGATIVE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNARY_NEGATIVE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNARY_NEGATIVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = -TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNARY_NOT">
+<code class="descname">execute_UNARY_NOT</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNARY_NOT"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNARY_NOT" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = not TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNARY_POSITIVE">
+<code class="descname">execute_UNARY_POSITIVE</code><span class="sig-paren">(</span><em>oparg</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNARY_POSITIVE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNARY_POSITIVE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements TOS = +TOS.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNPACK_EX">
+<code class="descname">execute_UNPACK_EX</code><span class="sig-paren">(</span><em>counts</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNPACK_EX"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNPACK_EX" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implements assignment with a starred target: Unpacks an iterable in TOS into individual values, where the total number
+of values can be smaller than the number of items in the iterable: one the new values will be a list of all leftover items.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_UNPACK_SEQUENCE">
+<code class="descname">execute_UNPACK_SEQUENCE</code><span class="sig-paren">(</span><em>count</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_UNPACK_SEQUENCE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_UNPACK_SEQUENCE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Unpacks TOS into count individual values, which are put onto the stack right-to-left.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_WITH_CLEANUP">
+<code class="descname">execute_WITH_CLEANUP</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_WITH_CLEANUP"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_WITH_CLEANUP" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cleans up the stack when a with statement block exits. TOS is the context manager’s __exit__() bound method.
+Below TOS are 1–3 values indicating how/why the finally clause was entered:
+SECOND = None
+(SECOND, THIRD) = (WHY_{RETURN,CONTINUE}), retval
+SECOND = WHY_*; no retval below it
+(SECOND, THIRD, FOURTH) = exc_info()
+In the last case, TOS(SECOND, THIRD, FOURTH) is called, otherwise TOS(None, None, None). In addition, TOS is
+removed from the stack.</p>
+<p>If the stack represents an exception, and the function call returns a ‘true’ value, this information is “zapped”
+and replaced with a single WHY_SILENCED to prevent END_FINALLY from re-raising the exception. (But non-local gotos
+will still be resumed.)</p>
+<p>All of the following opcodes expect arguments. An argument is two bytes, with the more significant byte last.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_YIELD_FROM">
+<code class="descname">execute_YIELD_FROM</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_YIELD_FROM"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_YIELD_FROM" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops TOS and delegates to it as a subiterator from a generator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.execute_YIELD_VALUE">
+<code class="descname">execute_YIELD_VALUE</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.execute_YIELD_VALUE"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.execute_YIELD_VALUE" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops TOS and yields it from a generator.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="vm.vm.BytecodeVM.print_members">
+<code class="descname">print_members</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/vm/vm.html#BytecodeVM.print_members"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#vm.vm.BytecodeVM.print_members" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="vm.vm.BytecodeVM.value">
+<code class="descname">value</code><a class="headerlink" href="#vm.vm.BytecodeVM.value" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-vm">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-vm" title="Permalink to this headline">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="utils.html" class="btn btn-neutral" title="utils package"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2015, Satyajit Sarangi.
+    </p>
+  </div>
+
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
