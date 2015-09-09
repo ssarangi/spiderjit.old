@@ -202,10 +202,42 @@ then: ; pred: ['entry']
       <div class="row featurette">
         <div class="col-md-7 col-md-push-5">
           <h2 class="featurette-heading">Multiple Interpreters: <span class="text-muted">Python bytecode interpreter, IR interpreter</span></h2>
-          <p class="lead">SpiderJIT features 2 interpreters at this point. One of them is a bytecode interpreter and the other one is the ir interpreter. The bytecode interpreter will primarily be used for hotspot analysis and as a tracing jit. The IR interpreter on the other hand will be used for verifying the generated code from the frontend. For languages like python, eval along with the ir interpreter will serve the purpose of verification.</p>
+          <p class="lead">SpiderJIT features 2 interpreters at this point. One of them is a bytecode interpreter and the other one is the ir interpreter. The bytecode interpreter will primarily be used for hotspot analysis and as a tracing jit. The IR interpreter on the other hand will be used for verifying the generated code from the frontend. For languages like python, eval along with the ir interpreter will serve the purpose of verification. The image on the left shows Fibonacci series with the bytecode interpreter.</p>
         </div>
         <div class="col-md-5 col-md-pull-7">
-          <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
+          <!-- <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image"> -->
+<pre><code class="python featurette-image" center-block>
+  2           0 LOAD_FAST                0 (n)
+              3 LOAD_CONST               1 (1)
+              6 COMPARE_OP               1 (<=)
+              9 POP_JUMP_IF_FALSE       16
+
+  3          12 LOAD_CONST               1 (1)
+             15 RETURN_VALUE
+
+  4     >>   16 LOAD_GLOBAL              0 (fib)
+             19 LOAD_FAST                0 (n)
+             22 LOAD_CONST               1 (1)
+             25 BINARY_SUBTRACT
+             26 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+             29 LOAD_GLOBAL              0 (fib)
+             32 LOAD_FAST                0 (n)
+             35 LOAD_CONST               2 (2)
+             38 BINARY_SUBTRACT
+             39 CALL_FUNCTION            1 (1 positional, 0 keyword pair)
+             42 BINARY_ADD
+             43 RETURN_VALUE
+fib( 0 ) = 1  =  1
+fib( 1 ) = 1  =  1
+fib( 2 ) = 2  =  2
+fib( 3 ) = 3  =  3
+fib( 4 ) = 5  =  5
+fib( 5 ) = 8  =  8
+fib( 6 ) = 13  =  13
+fib( 7 ) = 21  =  21
+fib( 8 ) = 34  =  34
+fib( 9 ) = 55  =  55
+          </code></pre>          
         </div>
       </div>
 
@@ -213,8 +245,8 @@ then: ; pred: ['entry']
 
       <div class="row featurette">
         <div class="col-md-7">
-          <h2 class="featurette-heading">And lastly, this one. <span class="text-muted">Checkmate.</span></h2>
-          <p class="lead">Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.</p>
+          <h2 class="featurette-heading">Code Generation to x86: <span class="text-muted"> (WIP)</span></h2>
+          <p class="lead">Code generation is still under work in progress. It uses pyasm2 to generate the code.</p>
         </div>
         <div class="col-md-5">
           <img class="featurette-image img-responsive center-block" data-src="holder.js/500x500/auto" alt="Generic placeholder image">
