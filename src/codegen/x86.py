@@ -11,7 +11,7 @@ class X86CodeGen(IRBaseVisitor):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
     def visit_function(self, node, arg_list):
-        x86.pushl(x86.ebp)
+        x86.pushf(x86.ebp)    # Save the frame pointer
 
     def visit_callinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
