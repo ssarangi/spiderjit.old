@@ -68,9 +68,6 @@ class IRBaseVisitor(BaseVisitor):
     def visit_switchinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
     
-    def visit_selectinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
-
     def visit_icmpinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
