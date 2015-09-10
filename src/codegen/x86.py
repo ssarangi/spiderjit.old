@@ -1,7 +1,7 @@
 __author__ = 'sarangis'
 
 from ir.base_ir_visitor import *
-import codegen.pyasm2 as x86
+from codegen.pyasm2 import *
 
 class X86CodeGen(IRBaseVisitor):
     def __init__(self):
@@ -11,7 +11,11 @@ class X86CodeGen(IRBaseVisitor):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
     def visit_function(self, node, arg_list):
-        x86.pushf(x86.ebp)    # Save the frame pointer
+        pushf(ebp)                                          # Save the frame pointer
+        mov(esp, ebp)                                       # Create a new frame pointer
+        mov(dword[ebp + 8], edx)                            # Get xp
+        mov(edx, eax)                                       # Retrieve the xp
+        
 
     def visit_callinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
