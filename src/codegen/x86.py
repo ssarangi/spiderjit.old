@@ -8,14 +8,11 @@ class X86CodeGen(IRBaseVisitor):
         IRBaseVisitor.__init__(self)
 
     def visit_module(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+        self.visit(node.entry_point)
 
-    def visit_function(self, node, arg_list):
-        pushf(ebp)                                          # Save the frame pointer
-        mov(esp, ebp)                                       # Create a new frame pointer
-        mov(dword[ebp + 8], edx)                            # Get xp
-        mov(edx, eax)                                       # Retrieve the xp
-        
+    def visit_function(self, node):
+        print(push(ebp))                                           # Save the frame pointer
+        print(mov(esp, ebp))                                       # Create a new frame pointer
 
     def visit_callinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())

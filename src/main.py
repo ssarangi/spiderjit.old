@@ -6,6 +6,7 @@ from pyjit.decorators import *
 from vm.vm import *
 from ir.interpreter import *
 from pytests.fib import *
+from codegen.x86 import *
 
 int32Ty = IntType(32)
 floatTy = FloatType()
@@ -79,6 +80,9 @@ def generate_ir():
     irvm = IRVirtualMachine()
     irvm.visit(mod)
     print(irvm.eval_result)
+
+    codegen = X86CodeGen()
+    codegen.visit(mod)
 
 # @autojit
 # def addup(n):
