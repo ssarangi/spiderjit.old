@@ -11,6 +11,9 @@ class IRBaseVisitor(BaseVisitor):
     def visit_function(self, node, arg_list=None):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
+    def visit_basicblock(self, node):
+        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
+
     def visit_callinstruction(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
@@ -102,7 +105,4 @@ class IRBaseVisitor(BaseVisitor):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
 
     def visit_xorinstruction(self, node):
-        raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())
-
-    def visit_basicblock(self, node):
         raise NotImplementedError("IR Node not implemented: visit_%s" % type(node).__name__.lower())

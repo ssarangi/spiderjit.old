@@ -1,9 +1,9 @@
 __author__ = 'sarangis'
 
-from optimizer.pass_support import *
+from optimizer.pass_support import FunctionPass, ModulePass
 from ir.validator import *
-from ir.module import *
-from ir.function import *
+from ir.module import Module
+from ir.function import Function
 
 class PrintFunctionsPass(ModulePass):
     def __init__(self):
